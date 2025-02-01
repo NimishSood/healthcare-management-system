@@ -1,34 +1,35 @@
 package com.example.healthcare.controller;
 
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 
+/**
+ * Represents a request to book an appointment.
+ */
+@Getter
+@Setter
+@ToString
 public class AppointmentRequest {
+
+    /**
+     * The ID of the doctor for the appointment.
+     */
+    @NotNull(message = "Doctor ID is required")
     private Long doctorId;
+
+    /**
+     * The ID of the patient for the appointment.
+     */
+    @NotNull(message = "Patient ID is required")
     private Long patientId;
+
+    /**
+     * The date and time of the appointment.
+     */
+    @NotNull(message = "Appointment time is required")
     private LocalDateTime appointmentTime;
-
-    // Getters and setters
-    public Long getDoctorId() {
-        return doctorId;
-    }
-
-    public void setDoctorId(Long doctorId) {
-        this.doctorId = doctorId;
-    }
-
-    public Long getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(Long patientId) {
-        this.patientId = patientId;
-    }
-
-    public LocalDateTime getAppointmentTime() {
-        return appointmentTime;
-    }
-
-    public void setAppointmentTime(LocalDateTime appointmentTime) {
-        this.appointmentTime = appointmentTime;
-    }
 }

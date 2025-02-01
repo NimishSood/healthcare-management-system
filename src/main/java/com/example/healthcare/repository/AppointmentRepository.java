@@ -14,4 +14,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     // New method to check for overlapping appointments
     List<Appointment> findByDoctorIdAndAppointmentTimeBetween(
             Long doctorId, LocalDateTime startTime, LocalDateTime endTime);
+
+
 }

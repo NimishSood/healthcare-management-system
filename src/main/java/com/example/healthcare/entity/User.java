@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
@@ -42,6 +44,23 @@ public class User {
     @NotNull
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.PATIENT; // Default role
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = createdAt; // Initially, same as createdAt
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     @NotNull
     @Enumerated(EnumType.STRING)

@@ -68,7 +68,7 @@ class UserRepositoryTest {
     void testFindDoctorByEmail() {
         Optional<User> foundDoctorOpt = userRepository.findByEmail("doctor@example.com");
         assertTrue(foundDoctorOpt.isPresent(), "Doctor should exist in the database");
-        assertTrue(foundDoctorOpt.get() instanceof Doctor, "Retrieved user should be a Doctor");
+        assertInstanceOf(Doctor.class, foundDoctorOpt.get(), "Retrieved user should be a Doctor");
 
         Doctor foundDoctor = (Doctor) foundDoctorOpt.get();
         assertEquals("John", foundDoctor.getFirstName());
@@ -81,7 +81,7 @@ class UserRepositoryTest {
     void testFindPatientByEmail() {
         Optional<User> foundPatientOpt = userRepository.findByEmail("patient@example.com");
         assertTrue(foundPatientOpt.isPresent(), "Patient should exist in the database");
-        assertTrue(foundPatientOpt.get() instanceof Patient, "Retrieved user should be a Patient");
+        assertInstanceOf(Patient.class, foundPatientOpt.get(), "Retrieved user should be a Patient");
 
         Patient foundPatient = (Patient) foundPatientOpt.get();
         assertEquals("Jane", foundPatient.getFirstName());
@@ -132,7 +132,7 @@ class UserRepositoryTest {
     void testUpdateDoctorDetails() {
         Optional<User> foundDoctorOpt = userRepository.findByEmail("doctor@example.com");
         assertTrue(foundDoctorOpt.isPresent(), "Doctor should exist before updating");
-        assertTrue(foundDoctorOpt.get() instanceof Doctor, "Retrieved user should be a Doctor");
+        assertInstanceOf(Doctor.class, foundDoctorOpt.get(), "Retrieved user should be a Doctor");
 
         Doctor doctor = (Doctor) foundDoctorOpt.get();
         doctor.setSpecialty("Neurology");
@@ -141,7 +141,7 @@ class UserRepositoryTest {
 
         Optional<User> updatedDoctorOpt = userRepository.findByEmail("doctor@example.com");
         assertTrue(updatedDoctorOpt.isPresent(), "Updated doctor should exist");
-        assertTrue(updatedDoctorOpt.get() instanceof Doctor, "Updated user should be a Doctor");
+        assertInstanceOf(Doctor.class, updatedDoctorOpt.get(), "Updated user should be a Doctor");
 
         Doctor updatedDoctor = (Doctor) updatedDoctorOpt.get();
         assertEquals("Neurology", updatedDoctor.getSpecialty());
@@ -154,7 +154,7 @@ class UserRepositoryTest {
     void testDeletePatient() {
         Optional<User> foundPatientOpt = userRepository.findByEmail("patient@example.com");
         assertTrue(foundPatientOpt.isPresent(), "Patient should exist before deletion");
-        assertTrue(foundPatientOpt.get() instanceof Patient, "Retrieved user should be a Patient");
+        assertInstanceOf(Patient.class, foundPatientOpt.get(), "Retrieved user should be a Patient");
 
         userRepository.delete(foundPatientOpt.get());
 

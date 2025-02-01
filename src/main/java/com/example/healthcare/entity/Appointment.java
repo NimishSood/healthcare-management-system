@@ -32,7 +32,8 @@ public class Appointment {
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
 
-    private boolean isDeleted = false; // Soft deletion flag
+    @Column(nullable = false)
+    private boolean isDeleted = false;  // Default value
 
 
 }

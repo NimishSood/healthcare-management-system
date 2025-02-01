@@ -6,6 +6,7 @@ import com.example.healthcare.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,4 +37,10 @@ public class UserService {
         user.setDeleted(true); // Soft deletion
         userRepository.save(user);
     }
+
+    public List<User> getUsersCreatedLast30Days() {
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        return userRepository.findByCreatedAtAfter(thirtyDaysAgo);
+    }
+
 }

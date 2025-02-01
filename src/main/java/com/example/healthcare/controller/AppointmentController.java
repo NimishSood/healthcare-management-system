@@ -4,6 +4,7 @@ import com.example.healthcare.entity.Appointment;
 import com.example.healthcare.entity.Doctor;
 import com.example.healthcare.entity.Patient;
 import com.example.healthcare.exception.AppointmentConflictException;
+import com.example.healthcare.exception.AppointmentNotFoundException;
 import com.example.healthcare.exception.DoctorNotFoundException;
 import com.example.healthcare.exception.PatientNotFoundException;
 import com.example.healthcare.repository.DoctorRepository;
@@ -29,27 +30,36 @@ public class AppointmentController {
 
     @PostMapping
     public ResponseEntity<?> bookAppointment(@RequestBody AppointmentRequest request) {
-        // Fetch doctor and patient from the database
-        Doctor doctor = doctorRepository.findById(request.getDoctorId())
-                .orElseThrow(() -> new DoctorNotFoundException("Doctor not found with id: " + request.getDoctorId()));
-
-        Patient patient = patientRepository.findById(request.getPatientId())
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + request.getPatientId()));
-
-        // Create the appointment
-        Appointment appointment = new Appointment();
-        appointment.setDoctor(doctor);
-        appointment.setPatient(patient);
-        appointment.setAppointmentTime(request.getAppointmentTime());
-
-        // Book the appointment
         try {
+            // Validate request fields
+            if (request.getDoctorId() == null || request.getPatientId() == null || request.getAppointmentTime() == null) {
+                return ResponseEntity.badRequest().body("Doctor ID, Patient ID, and Appointment Time are required.");
+            }
+
+            // Fetch doctor and patient
+            Doctor doctor = doctorRepository.findById(request.getDoctorId())
+                    .orElseThrow(() -> new DoctorNotFoundException("Doctor not found with id: " + request.getDoctorId()));
+            Patient patient = patientRepository.findById(request.getPatientId())
+                    .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + request.getPatientId()));
+
+            // Create and book appointment
+            Appointment appointment = new Appointment();
+            appointment.setDoctor(doctor);
+            appointment.setPatient(patient);
+            appointment.setAppointmentTime(request.getAppointmentTime());
+
             Appointment bookedAppointment = appointmentService.bookAppointment(appointment);
             return ResponseEntity.status(HttpStatus.CREATED).body(bookedAppointment);
+        } catch (DoctorNotFoundException | PatientNotFoundException e) {
+            // Catch and handle the DoctorNotFoundException and PatientNotFoundException
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (AppointmentConflictException e) {
-            throw e; // Propagate the exception to the GlobalExceptionHandler
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
+
 
     @GetMapping
     public ResponseEntity<List<Appointment>> getAllAppointments() {
@@ -57,19 +67,35 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Appointment> getAppointment(@PathVariable Long id) {
-        return ResponseEntity.ok(appointmentService.getAppointment(id));
+    public ResponseEntity<?> getAppointment(@PathVariable Long id) {
+        try {
+            Appointment appointment = appointmentService.getAppointment(id);
+            return ResponseEntity.ok(appointment);
+        } catch (AppointmentNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateAppointment(@PathVariable Long id, @RequestBody Appointment updated) {
-        appointmentService.updateAppointment(id, updated);
-        return ResponseEntity.ok("Appointment updated successfully");
+        try {
+            appointmentService.updateAppointment(id, updated);
+            return ResponseEntity.ok("Appointment updated successfully");
+        } catch (AppointmentNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> cancelAppointment(@PathVariable Long id) {
-        appointmentService.cancelAppointment(id);
-        return ResponseEntity.ok("Appointment canceled");
+        try {
+            appointmentService.cancelAppointment(id);
+            return ResponseEntity.ok("Appointment canceled");
+        } catch (AppointmentNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
+
 }
