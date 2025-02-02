@@ -9,4 +9,14 @@ public enum UserRole {
     public boolean isAdminOrOwner() {
         return this == ADMIN || this == OWNER;
     }
+
+    public boolean isAdmin()
+    {
+        return this == ADMIN;
+    }
+
+    public boolean isOwner()
+    {
+        return this == OWNER;
+    }
 }

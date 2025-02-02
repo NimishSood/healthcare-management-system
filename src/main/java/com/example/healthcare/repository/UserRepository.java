@@ -1,6 +1,7 @@
 package com.example.healthcare.repository;
 
 import com.example.healthcare.entity.User;
+import com.example.healthcare.entity.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
@@ -15,4 +16,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String mail);
 
     List<User> findByCreatedAtAfter(LocalDateTime thirtyDaysAgo);
+    List<User> findByRoleAndIsDeletedFalse(UserRole role);
 }

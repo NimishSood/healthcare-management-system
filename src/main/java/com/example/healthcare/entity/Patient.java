@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@DiscriminatorValue("patients")
+@DiscriminatorValue("Patient")
 @Getter
 @Setter
 public class Patient extends User {

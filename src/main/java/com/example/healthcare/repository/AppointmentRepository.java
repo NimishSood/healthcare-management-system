@@ -16,4 +16,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             Long doctorId, LocalDateTime startTime, LocalDateTime endTime);
 
 
+    long countByAppointmentTimeAfter(LocalDateTime localDateTime);
 }

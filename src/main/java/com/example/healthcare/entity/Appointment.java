@@ -34,6 +34,4 @@ public class Appointment {
 
     @Column(nullable = false)
     private boolean isDeleted = false;  // Default value
-
-
 }

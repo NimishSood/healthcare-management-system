@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@DiscriminatorValue("doctors")
+@DiscriminatorValue("Doctor")
 @Getter
 @Setter
 public class Doctor extends User {
@@ -23,6 +23,4 @@ public class Doctor extends User {
     private Integer yearsOfExperience;
 
     private boolean isDeleted = false; // Soft deletion flag
-
-
 }

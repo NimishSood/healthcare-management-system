@@ -43,4 +43,9 @@ public class UserService {
         return userRepository.findByCreatedAtAfter(thirtyDaysAgo);
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found."));
+    }
+
 }
