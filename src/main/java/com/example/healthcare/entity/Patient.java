@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class Patient extends User {
 
-    @NotBlank
+
     private String insuranceProvider;
 
     private boolean isDeleted = false; // Soft deletion flag
