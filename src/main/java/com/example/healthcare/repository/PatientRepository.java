@@ -8,5 +8,8 @@ import java.util.Optional;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
     List<Patient> findAllByIsDeletedFalse();
+
     Optional<Patient> findByIdAndIsDeletedFalse(Long id); // Return Optional<Patient>
+
+
 }

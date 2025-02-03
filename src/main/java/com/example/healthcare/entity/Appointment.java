@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Setter
 public class Appointment {
 
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +25,7 @@ public class Appointment {
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
+
     @Column(nullable = false)
     private LocalDateTime appointmentTime;
 
@@ -34,4 +34,32 @@ public class Appointment {
 
     @Column(nullable = false)
     private boolean isDeleted = false;  // Default value
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "cancelled_by", nullable = true)
+    private User cancelledBy;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+
+
+
+
+
+    // ✅ Removed incorrect `setDate()` method
 }

@@ -5,7 +5,8 @@ public enum AccountStatus {
     DEACTIVATED,
     LOCKED;
 
-    public boolean isActive() {
+    public boolean isActive()
+    {
         return this == ACTIVE;
     }
 }

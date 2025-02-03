@@ -19,28 +19,34 @@ import java.util.Optional;
 @Service
 @ComponentScan("com.example.healthcare.config")
 @RequiredArgsConstructor
-public class AuthService
-{
-
+public class AuthService {
 
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
 
+    // ✅ User Registration
     public void registerUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
+            auditLogService.logAction(
+                    "Registration Failed", user.getEmail(), user.getRole().name(),
+                    "User attempted to register", "Reason: Email already in use", null
+            );
             throw new IllegalArgumentException("Email is already in use.");
         }
 
         if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.OWNER) {
+            auditLogService.logAction(
+                    "Registration Denied", user.getEmail(), user.getRole().name(),
+                    "User attempted to register", "Reason: Cannot self-register as Admin/Owner", null
+            );
             throw new IllegalArgumentException("Admins and Owners cannot self-register.");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // ✅ Correctly instantiate subclass
         if (user.getRole() == UserRole.PATIENT) {
-            Patient patient = new Patient();  // ✅ Create a Patient object
+            Patient patient = new Patient();
             patient.setFirstName(user.getFirstName());
             patient.setLastName(user.getLastName());
             patient.setEmail(user.getEmail());
@@ -48,35 +54,61 @@ public class AuthService
             patient.setPhoneNumber(user.getPhoneNumber());
             patient.setRole(UserRole.PATIENT);
 
-            userRepository.save(patient);  // ✅ Saves with dtype = 'Patient'
+            userRepository.save(patient);
         } else {
             userRepository.save(user);
         }
+
+        auditLogService.logAction(
+                "User Registered", user.getEmail(), user.getRole().name(),
+                "New user account created", null, user.toString()
+        );
     }
 
-
-    // ✅ Authenticate user (Login)
+    // ✅ User Authentication (Login)
     public AuthResponse authenticate(AuthRequest authRequest) {
         Optional<User> userOptional = userRepository.findByEmail(authRequest.getEmail());
 
         if (userOptional.isEmpty() ||
                 !passwordEncoder.matches(authRequest.getPassword(), userOptional.get().getPassword())) {
+
+            auditLogService.logAction(
+                    "Failed Login Attempt", authRequest.getEmail(), "UNKNOWN",
+                    "Invalid login attempt", "Reason: Invalid credentials", null
+            );
+
             throw new UserNotFoundException("Invalid email or password.");
         }
 
         User user = userOptional.get();
+
+        auditLogService.logAction(
+                "User Logged In", user.getEmail(), user.getRole().name(),
+                "User successfully authenticated", null, null
+        );
+
         return new AuthResponse("Login successful", user.getRole().name());
     }
 
-    // ✅ Forgot Password (Send reset link)
+    // ✅ Forgot Password
     public void sendPasswordReset(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isEmpty()) {
+            auditLogService.logAction(
+                    "Password Reset Request Failed", email, "UNKNOWN",
+                    "User attempted to reset password", "Reason: Email not found", null
+            );
             throw new UserNotFoundException("User not found with email: " + email);
         }
 
-        // Simulate sending a password reset link (Implement proper email handling later)
+        // Simulated password reset (implement actual email logic)
         System.out.println("Password reset link sent to: " + email);
+
+        auditLogService.logAction(
+                "Password Reset Requested", email, userOptional.get().getRole().name(),
+                "User requested password reset", null, null
+        );
     }
 }
+

@@ -22,5 +22,5 @@ public class Doctor extends User {
     @PositiveOrZero
     private Integer yearsOfExperience;
 
-    private boolean isDeleted = false; // Soft deletion flag
+
 }

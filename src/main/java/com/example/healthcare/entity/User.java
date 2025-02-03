@@ -66,11 +66,27 @@ public class User {
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus = AccountStatus.ACTIVE; // Default status
 
-    private boolean isDeleted = false; // Soft deletion flag
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted;
+
 
     public String getDtype() {
         return this.getClass().getAnnotation(DiscriminatorValue.class) != null ?
                 this.getClass().getAnnotation(DiscriminatorValue.class).value() :
                 "USER";
+    }
+
+    public void setDeleted(boolean b) {
+        isDeleted = b;
+        if (b)
+        {
+            accountStatus = AccountStatus.DEACTIVATED;
+        }
+        else
+        {
+            accountStatus = AccountStatus.ACTIVE;
+        }
+
     }
 }

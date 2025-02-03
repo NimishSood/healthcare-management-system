@@ -15,5 +15,5 @@ public class Patient extends User {
 
     private String insuranceProvider;
 
-    private boolean isDeleted = false; // Soft deletion flag
+
 }

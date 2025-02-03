@@ -48,4 +48,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found."));
     }
 
+    public void updateUserProfile(Long id, User updatedAdmin) {
+
+    }
 }
