@@ -1,0 +1,42 @@
+Registered a new user with Postman using
+     URL: http://localhost:8080/api/auth/register
+     Headers:
+     Content-Type: application/json
+     Body (raw JSON):
+     json
+     Copy
+     {
+       "firstName": "Alice",
+       "lastName": "Smith",
+       "email": "alice@example.com",
+       "password": "secret123",
+       "phoneNumber": "1234567890"
+     }
+Successfully logged into newly created user(patient by default)
+    http://localhost:8080/api/auth/login?email=alice@example.com&password=secret123
+
+Successfully added admin :
+        INSERT INTO users (dtype, first_name, last_name, email, password, phone_number, role,is_Deleted)
+        VALUES ('Admin', 'Jane', 'Doe', 'jane.admin@example.com', '$2a$12$7Dno3VZxdaSe26yI0.ZDQO2/WLIBPb248M8/woziE3s4cSRk2sNwK', '1234567890', 'ADMIN',0);
+
+        Added in database the hashed pasword and in the postman sent login request using unhashed password:localhost:8080/api/auth/login?email=jane.admin@example.com&password=12345
+
+Successfully added patients using admin controller: To use any admin endpoints we have to authenticate by entering any admin email and password(unhashed) in the basic authentication tab of
+PostMan
+    http://localhost:8080/admin/add-patient?adminId=1
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "password": "securePassword",
+      "phoneNumber": "1234567890",
+      "insuranceProvider":"GOD"
+
+    }
+
+    Patient added successfully.
+
+    Succesfully added doctor, viewed all doctors
+    Removed doctor by passing Doctor ID
+    Removed Patient
+
