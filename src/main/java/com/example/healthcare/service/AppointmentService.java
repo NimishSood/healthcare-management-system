@@ -141,8 +141,20 @@ public class AppointmentService {
     }
 
     public List<Appointment> getPastAppointmentsByPatient(Long patientId) {
-        return appointmentRepository.findByPatientIdAndAppointmentTimeBefore(patientId, LocalDateTime.now());
+        List<Appointment> pastAppointments = appointmentRepository
+                .findByPatientIdAndAppointmentTimeBefore(patientId, LocalDateTime.now());
+
+        for (Appointment appointment : pastAppointments) {
+            if (appointment.getStatus().equals(AppointmentStatus.BOOKED)
+                    && appointment.getAppointmentTime().isBefore(LocalDateTime.now())) {
+                appointment.setStatus(AppointmentStatus.COMPLETED);
+                appointmentRepository.save(appointment); // 🔄 persists to DB
+            }
+        }
+
+        return pastAppointments;
     }
+
 
 
     // ✅ Get All Upcoming Appointments for a Doctor
