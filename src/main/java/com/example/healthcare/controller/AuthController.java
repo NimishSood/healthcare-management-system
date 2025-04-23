@@ -17,15 +17,15 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // ✅ Register a new user (Only Patients & Doctors can register)
+    // ✅ Register a new user (Only Patients can register)
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
-        if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.OWNER)
+        if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.OWNER || user.getRole() == UserRole.DOCTOR)
         {
-            return ResponseEntity.badRequest().body("Admins and Owners cannot self-register.");
+            return ResponseEntity.badRequest().body("Admins, Owner and Doctrors cannot self-register.");
         }
         authService.registerUser(user);
-        return ResponseEntity.status(201).body("User registered successfully");
+        return ResponseEntity.status(201).body("Patient registered successfully");
     }
 
     // ✅ Login (Returns success or failure)

@@ -35,12 +35,12 @@ public class AuthService {
             throw new IllegalArgumentException("Email is already in use.");
         }
 
-        if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.OWNER) {
+        if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.OWNER || user.getRole() == UserRole.DOCTOR) {
             auditLogService.logAction(
                     "Registration Denied", user.getEmail(), user.getRole().name(),
-                    "User attempted to register", "Reason: Cannot self-register as Admin/Owner", null
+                    "User attempted to register", "Reason: Cannot self-register as Admin/Owner/Doctor", null
             );
-            throw new IllegalArgumentException("Admins and Owners cannot self-register.");
+            throw new IllegalArgumentException("Admins,Owners and Doctors cannot self-register.");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -55,13 +55,10 @@ public class AuthService {
             patient.setRole(UserRole.PATIENT);
 
             userRepository.save(patient);
-        } else {
-            userRepository.save(user);
         }
-
         auditLogService.logAction(
-                "User Registered", user.getEmail(), user.getRole().name(),
-                "New user account created", null, user.toString()
+                "Patient Registered", user.getEmail(), user.getRole().name(),
+                "New patient account created", null, user.toString()
         );
     }
 
