@@ -57,10 +57,16 @@ public class PatientController {
     }
 
     // ✅ View Upcoming and Past Appointments
-    @GetMapping("/appointments")
-    public List<Appointment> getPatientAppointments(@AuthenticationPrincipal UserDetails userDetails) {
-        Patient authenticatedPatient = getAuthenticatedPatient(userDetails);
-        return appointmentService.getAppointmentsByPatient(authenticatedPatient.getId());
+    @GetMapping("/appointments/upcoming")
+    public List<Appointment> getUpcomingAppointments(@AuthenticationPrincipal UserDetails userDetails) {
+        Patient patient = getAuthenticatedPatient(userDetails);
+        return appointmentService.getUpcomingAppointmentsByPatient(patient.getId());
+    }
+
+    @GetMapping("/appointments/history")
+    public List<Appointment> getPastAppointments(@AuthenticationPrincipal UserDetails userDetails) {
+        Patient patient = getAuthenticatedPatient(userDetails);
+        return appointmentService.getPastAppointmentsByPatient(patient.getId());
     }
 
     @PostMapping("/appointments/book")

@@ -136,9 +136,14 @@ public class AppointmentService {
     }
 
     // ✅ Get All Appointments for a Specific Patient
-    public List<Appointment> getAppointmentsByPatient(Long patientId) {
-        return appointmentRepository.findByPatientId(patientId);
+    public List<Appointment> getUpcomingAppointmentsByPatient(Long patientId) {
+        return appointmentRepository.findByPatientIdAndAppointmentTimeAfter(patientId, LocalDateTime.now());
     }
+
+    public List<Appointment> getPastAppointmentsByPatient(Long patientId) {
+        return appointmentRepository.findByPatientIdAndAppointmentTimeBefore(patientId, LocalDateTime.now());
+    }
+
 
     // ✅ Get All Upcoming Appointments for a Doctor
     public List<Appointment> getUpcomingAppointments(User doctor) {
