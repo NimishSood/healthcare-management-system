@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class AuthResponse {
     private String message;
     private String role; // Useful if we want role-based logic later
+    private String token;
 }

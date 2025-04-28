@@ -24,6 +24,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
+    private final JwtService jwtService;
+
 
     // ✅ User Registration
     public void registerUser(User user) {
@@ -84,8 +86,13 @@ public class AuthService {
                 "User successfully authenticated", null, null
         );
 
-        return new AuthResponse("Login successful", user.getRole().name());
+        // 🔥 Generate the JWT token here
+        String token = jwtService.generateToken(user);
+
+        // 🔥 Now return the AuthResponse with the token
+        return new AuthResponse("Login successful", user.getRole().name(), token);
     }
+
 
     // ✅ Forgot Password
     public void sendPasswordReset(String email) {
