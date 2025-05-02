@@ -1,4 +1,4 @@
-package com.example.healthcare.dto;
+package com.example.healthcare.dto.Appointments;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

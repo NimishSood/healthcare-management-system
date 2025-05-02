@@ -1,7 +1,7 @@
 package com.example.healthcare.controller;
 
-import com.example.healthcare.dto.DoctorProfileDto;
-import com.example.healthcare.dto.ProfileMapper;
+import com.example.healthcare.dto.Profiles.DoctorProfileDto;
+import com.example.healthcare.dto.Profiles.ProfileMapper;
 import com.example.healthcare.entity.Appointment;
 import com.example.healthcare.entity.Doctor;
 import com.example.healthcare.security.SecurityUtils;

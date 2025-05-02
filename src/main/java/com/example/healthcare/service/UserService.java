@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +51,13 @@ public class UserService {
 
     public void updateUserProfile(Long id, User updatedAdmin) {
 
+    }
+
+    /**
+     * Fetches a non-deleted user or throws if missing.
+     */
+    public User getUserById(Long id) {
+        return userRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id " + id));
     }
 }

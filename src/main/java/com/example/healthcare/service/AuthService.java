@@ -1,16 +1,14 @@
 package com.example.healthcare.service;
 
-import com.example.healthcare.dto.AuthRequest;
-import com.example.healthcare.dto.AuthResponse;
+import com.example.healthcare.dto.Authorization.AuthRequest;
+import com.example.healthcare.dto.Authorization.AuthResponse;
 import com.example.healthcare.entity.Patient;
 import com.example.healthcare.entity.User;
 import com.example.healthcare.entity.enums.UserRole;
 import com.example.healthcare.exception.UserNotFoundException;
 import com.example.healthcare.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

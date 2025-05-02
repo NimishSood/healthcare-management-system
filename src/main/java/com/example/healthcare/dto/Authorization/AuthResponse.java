@@ -1,4 +1,4 @@
-package com.example.healthcare.dto;
+package com.example.healthcare.dto.Authorization;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

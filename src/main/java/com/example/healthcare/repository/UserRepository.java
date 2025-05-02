@@ -12,7 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long>
 {
     List<User> findAllByIsDeletedFalse();
 
-    User findById(long id);
+    Optional<User> findById(long id);
 
     Optional<User> findByIdAndIsDeletedFalse(Long id);
 
@@ -21,4 +21,5 @@ public interface UserRepository extends JpaRepository<User, Long>
     boolean existsByEmail(String email); // ✅ Check if email already exists
     List<User> findByCreatedAtAfter(LocalDateTime thirtyDaysAgo);
     List<User> findByRoleAndIsDeletedFalse(UserRole role);
+
 }

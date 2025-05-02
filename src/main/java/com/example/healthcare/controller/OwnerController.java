@@ -1,7 +1,7 @@
 package com.example.healthcare.controller;
 
-import com.example.healthcare.dto.OwnerProfileDto;
-import com.example.healthcare.dto.ProfileMapper;
+import com.example.healthcare.dto.Profiles.OwnerProfileDto;
+import com.example.healthcare.dto.Profiles.ProfileMapper;
 import com.example.healthcare.entity.Admin;
 import com.example.healthcare.entity.AuditLog;
 import com.example.healthcare.entity.Owner;

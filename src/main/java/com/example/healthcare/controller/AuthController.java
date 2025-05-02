@@ -1,7 +1,7 @@
 package com.example.healthcare.controller;
 
-import com.example.healthcare.dto.AuthRequest;
-import com.example.healthcare.dto.AuthResponse;
+import com.example.healthcare.dto.Authorization.AuthRequest;
+import com.example.healthcare.dto.Authorization.AuthResponse;
 import com.example.healthcare.entity.User;
 import com.example.healthcare.entity.enums.UserRole;
 import com.example.healthcare.service.AuthService;
@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController
+{
 
 
     private final AuthService authService;
