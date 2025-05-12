@@ -1,0 +1,112 @@
+Project Overview
+The Healthcare Management System (HMS) is an advanced, user-centric platform designed to streamline and manage healthcare operations for patients, doctors, administrators, and owners. This system incorporates a wide range of functionalities, including appointment scheduling, prescription management, patient-doctor communication, analytics, user management, and compliance with industry standards such as HIPAA and GDPR. The primary objective is to ensure seamless interaction between stakeholders, robust data security, and operational scalability.
+________________________________________
+System Features
+1. Patient Portal
+The patient portal allows users to manage their healthcare interactions efficiently.
+•	My Documents:
+o	Access: Patients can retrieve medical documents such as prescriptions, reports, and receipts.
+o	Filtering and Sorting: Documents are filtered by type, date range, or keywords.
+o	Preview and Download: Allows patients to preview details and download documents in PDF format.
+o	Edge Cases: Handles scenarios where no documents are available by displaying appropriate messages.
+•	My Profile:
+o	Profile Management: Patients can update personal details such as name, contact information, and insurance.
+o	Secure Updates: Sensitive changes require OTP verification with up to three retries. Failed attempts escalate to customer support.
+o	Notifications: Confirmation messages are sent after successful updates.
+•	Notifications:
+o	Notification Management: Displays reminders, confirmations, and updates categorized as read or unread.
+o	Actions: Allows marking notifications as read, clearing all notifications, and filtering by type (e.g., cancellations, prescriptions).
+o	Fallback: Displays a "no notifications available" message if applicable.
+•	Help/Support:
+o	FAQ and Tickets: Includes keyword-based FAQ search and ticket submission for unresolved issues.
+o	Contact Support: Displays contact numbers and operational hours for further assistance.
+•	Home Page:
+o	Login and Signup: Patients can register or log in securely with OTP-based verification.
+o	Forgot Password: Allows password recovery using email validation and OTP verification.
+•	Appointments:
+o	Upcoming Appointments:
+	Patients can view, cancel, or reschedule appointments. Cancellation requires OTP confirmation.
+	System handles retry failures and escalates to customer support if OTP attempts are exhausted.
+o	Book New Appointment:
+	Self-Assessment: Recommends departments and doctors based on guided symptom questions.
+	Manual Booking: Patients can select departments, apply filters, and book slots directly.
+	Emergency Booking: Offers the next available slot without requiring OTP verification.
+	Confirmation: Sends appointment details to patients and doctors via email and notifications.
+o	View History:
+	Patients can access past appointments, rate doctors, and download related documents.
+________________________________________
+2. Doctor Portal
+The doctor portal provides tools to manage schedules, view past appointments, communicate with patients, and analyze performance.
+•	Manage Schedule:
+o	Calendar View: Doctors can view, update, and block time slots.
+o	Conflict Resolution: Automatically detects schedule conflicts and notifies affected patients.
+•	View Past Appointments:
+o	History Access: Provides a list of previous appointments with filters by patient name, date, or type.
+o	Document Uploads: Doctors can attach additional documents like prescriptions to patient records.
+•	Patient Messaging:
+o	Direct Communication: Doctors can initiate or continue conversations with patients.
+o	Attachments: Enables sharing documents and images.
+o	Message Notifications: Alerts doctors of new or unread messages.
+•	Analytics:
+o	Performance Metrics: Displays appointment statistics, earnings, and feedback trends.
+o	Custom Filters: Allows analysis by date range, appointment type, or demographics.
+o	Export Options: Generates reports in PDF or spreadsheet formats.
+•	Billings/Earnings:
+o	Earnings Overview: Displays total income, breakdowns by appointment type, and pending payments.
+o	Export Reports: Allows exporting earnings data for record-keeping.
+________________________________________
+3. Admin Portal
+Administrators manage users, appointments, and system settings while monitoring overall performance.
+•	Appointment Management:
+o	Edit and Cancel: Admins can modify appointment details or cancel appointments with notifications to stakeholders.
+o	Filtering: Provides options to sort appointments by date, department, or doctor.
+•	User Management:
+o	Add/Edit/Delete Users: Admins can manage user accounts, including roles and permissions.
+o	Confirmation and Notifications: Ensures changes are secure and notify relevant parties.
+•	Messaging:
+o	Broadcast Messages: Allows sending announcements to all or specific user groups.
+o	Direct Replies: Admins can respond to user queries individually.
+•	Analytics/Reports:
+o	System Metrics: Includes data on appointments, earnings, and user activity.
+o	Export Reports: Generates detailed insights for compliance and operational analysis.
+•	System Settings:
+o	Security Policies: Configures 2FA, password policies, and data retention rules.
+o	Compliance Settings: Updates GDPR and HIPAA configurations.
+o	Working Hours: Modifies platform-wide hours of operation.
+•	Audit Logs:
+o	Activity Tracking: Logs admin actions with timestamps and affected entities.
+o	Export Logs: Generates audit reports for compliance purposes.
+________________________________________
+4. Owner Portal
+The owner portal oversees system-wide configurations, access management, and advanced analytics.
+•	Manage Admin Access:
+o	Role Management: Owners can add, edit, or deactivate admin accounts.
+o	Temporary Deactivation: Provides an option to suspend admin access temporarily.
+•	System Configuration:
+o	Billing Settings: Modifies payment configurations.
+o	Notification Preferences: Updates email and SMS templates.
+o	Platform Settings: Adjusts system-wide parameters such as working hours.
+•	Analytics:
+o	Overview Metrics: Includes revenue, appointment trends, and user engagement.
+o	Graphical Visualizations: Displays charts and trends for quick insights.
+•	Audit Logs:
+o	System-Wide Logs: Tracks activities across all portals.
+o	Export Options: Generates detailed compliance reports.
+________________________________________
+Key System Features
+1.	Scalability: Designed to handle large user volumes and high transaction rates.
+2.	Security:
+o	HIPAA/GDPR compliance.
+o	Two-factor authentication for sensitive actions.
+o	Audit trails for all critical activities.
+3.	Notifications:
+o	Real-time notifications for appointments, cancellations, and updates.
+4.	Fallback Mechanisms:
+o	OTP retries and escalation paths.
+o	Clear messages for edge cases (e.g., "no data found").
+5.	Reports and Exports:
+o	Support for generating detailed PDFs and spreadsheets.
+6.	Ease of Use:
+o	Intuitive UI with logical navigation paths.
+o	Comprehensive filtering and sorting capabilities.
+

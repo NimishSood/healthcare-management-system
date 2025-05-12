@@ -1,0 +1,123 @@
+Healthcare Appointment System – Comprehensive Project Specification
+1. Introduction
+The Healthcare Appointment System is a comprehensive platform designed to cater to multiple user roles: Patients, Doctors, Admins, and Owners. It ensures seamless operations in healthcare management, encompassing functionalities such as appointment booking, user profile management, secure messaging, analytics, prescription handling, notifications, and compliance with global data protection standards (e.g., HIPAA, GDPR). The system is designed for scalability, security, and usability, serving as a robust solution for modern healthcare organizations.
+Key Features
+•	Role-Based User Management: Supports Patient, Doctor, Admin, and Owner roles with distinct privileges and responsibilities.
+•	Appointment Booking and Management: Includes OTP verification, conflict checks, and detailed appointment statuses.
+•	Document Handling: Upload, view, and manage medical documents, including prescriptions and lab reports.
+•	Secure Messaging: Real-time or asynchronous communication between Doctors and Patients.
+•	Notifications System: Timely alerts for appointments, prescriptions, and administrative actions.
+•	Analytics and Reporting: Tailored insights for Doctors, Admins, and Owners with exportable reports.
+•	Owner-Level Controls: System configurations, admin management, and advanced analytics.
+•	Compliance and Security: Ensures data encryption, audit trails, and role-based access control.
+________________________________________
+2. Class Hierarchy Overview
+2.1. User (Abstract Parent Class)
+The User class is the foundation for all system roles, encapsulating shared properties and behaviors.
+Fields
+•	id (Long): Unique identifier for each user.
+•	firstName, lastName (String): Personal name fields.
+•	email (String): Must be unique, used for login.
+•	password (String): Encrypted; follows complexity rules.
+•	role (String): Defines the role: PATIENT, DOCTOR, ADMIN, OWNER.
+•	accountStatus (String): ACTIVE, DEACTIVATED, LOCKED.
+•	createdAt, updatedAt (Timestamp): Timestamps for record lifecycle.
+Methods
+1.	isActive(): Checks if the user account is active.
+2.	getFullName(): Returns concatenated first and last name.
+3.	sendOTP(): Sends OTP for verification.
+4.	verifyOTP(otpCode): Validates the OTP.
+2.2. Patient (Extends User)
+Stores patient-specific information and functionalities.
+Fields
+•	insuranceProvider (String): Patient’s insurance details.
+•	dateOfBirth (LocalDate): Used for age checks and record-keeping.
+•	address (String): Patient’s primary address.
+•	phoneNumber (String): Contact number for notifications.
+•	medicalHistory (String): Optional field for allergies, conditions.
+Methods
+1.	getInsuranceInfo(): Retrieves insurance details.
+2.	updateProfile(newAddress, newPhoneNumber, ...): Updates profile with optional OTP verification.
+3.	viewMyDocuments(): Fetches all patient-associated documents.
+4.	requestRefill(prescriptionId): Initiates a refill request.
+2.3. Doctor (Extends User)
+Represents healthcare professionals with specialized fields and methods.
+Fields
+•	specialty (String): e.g., Cardiology, Pediatrics.
+•	licenseNumber (String): Professional accreditation.
+•	yearsOfExperience (int): Number of years in practice.
+•	ratings (double): Aggregate patient feedback score.
+•	availabilitySlots (List<TimeRange>): Optional for advanced scheduling.
+Methods
+1.	getUpcomingAppointments(): Retrieves future appointments.
+2.	addAvailabilitySlot(start, end): Adds available time slots.
+3.	markAppointmentComplete(appointment): Marks an appointment as completed.
+4.	startConversation(patientId): Initiates messaging.
+5.	sendMessage(conversation, content): Sends messages to patients.
+2.4. Admin (Extends User)
+Responsible for system-wide management and oversight.
+Methods
+1.	createUser(role, email, password, firstName, lastName): Adds new users.
+2.	deactivateUser(userId): Deactivates user accounts.
+3.	rescheduleDoctorDay(doctorId, date, newDate): Manages appointment rescheduling.
+4.	bulkNotifyUsers(message, criteria): Sends notifications to multiple users.
+5.	viewSystemAnalytics(filters): Generates system-level reports.
+2.5. Owner (Extends Admin)
+Top-level role with complete authority over the system.
+Fields
+•	ownershipData (String): Optional ownership details.
+Methods
+1.	createAdmin(email, password, firstName, lastName): Adds new admins.
+2.	removeAdmin(adminId): Removes admin privileges.
+3.	manageAdminAccess(adminId, newPermissions): Updates admin roles.
+4.	updateSystemSettings(settings: SystemSettings): Configures global settings.
+5.	viewOwnerAnalytics(filters): Advanced analytics for Owners.
+6.	viewAuditLogs(filters): Retrieves audit trails.
+________________________________________
+3. Entity Classes
+3.1. Appointment
+Links a Patient and Doctor, managing scheduling and statuses.
+Fields
+•	id (Long), patient (Patient), doctor (Doctor)
+•	dateTime (LocalDateTime), status (String)
+•	reasonForVisit (String), otpRequired (boolean)
+Methods
+1.	cancel(cancellationReason): Cancels appointments.
+2.	reschedule(newDateTime): Updates appointment timing.
+3.	sendBookingOTP(): Handles OTP confirmations.
+3.2. Document
+Handles patient-related files (prescriptions, lab results).
+Fields
+•	id, patient, documentType, filePath, createdAt
+Methods
+1.	download(): Retrieves document content.
+2.	encryptDocument(key): Secures sensitive files.
+3.3. Prescription
+Manages medical prescriptions and refills.
+Fields
+•	id, patient, doctor, medication, refillsRemaining, issuedAt
+Methods
+1.	requestRefill(): Initiates a refill process.
+2.	approveRefill(): Approves refill requests.
+3.	denyRefill(): Denies refill requests.
+________________________________________
+4. Supporting Entities
+Notification
+•	Fields: id, userId, message, readAt, type
+•	Methods: markAsRead()
+Message/Conversation
+•	Fields: conversationId, participants, messages, timestamp
+•	Supports real-time and asynchronous communication.
+AuditLog
+•	Fields: id, userId, action, timestamp, details
+•	Provides compliance and oversight.
+SystemSettings
+•	Fields: id, settingKey, settingValue
+•	Controls global configurations.
+Billing
+•	Fields: appointmentId, paymentStatus, amount
+•	Handles financial transactions.
+________________________________________
+5. Conclusion
+This detailed design ensures a comprehensive, scalable, and user-friendly Healthcare Appointment System. It emphasizes security, compliance, and robust workflows to meet the needs of modern healthcare management. Further enhancements can include telemedicine integration, AI-driven analytics, and expanded patient engagement features.
+

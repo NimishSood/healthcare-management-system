@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="90244cca-aced-4ef7-b3f4-383e4f3fd928" name="Changes" comment="feat: messaging across users with read, inbox, sent&#10;Tested By : Postman and Workbench" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Exception" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/backend" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;NimishSood&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/NimishSood/healthcare-management-system.git&quot;,
+    &quot;accountId&quot;: &quot;b6d49963-e42d-4fde-b6b3-4d63c871e14a&quot;
+  }
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2rp9oaoqFWLwYoTmlD6Lh3ReWau" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+    <option name="sortByType" value="true" />
+    <option name="sortKey" value="BY_TYPE" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.HealthcareApplication.executor": "Run",
+    "HTTP Request.generated-requests | #1.executor": "Run",
+    "HTTP Request.generated-requests | #2.executor": "Run",
+    "JUnit.AdminControllerTest.executor": "Run",
+    "JUnit.AdminControllerTest.testAddAdmin.executor": "Run",
+    "JUnit.AdminControllerTest.testRemovePatient_Unauthorized.executor": "Run",
+    "JUnit.AdminControllerTest.testViewDoctors_Success.executor": "Run",
+    "JUnit.AdminControllerTest.testViewPatients_Success.executor": "Run",
+    "JUnit.AdminServiceTest.executor": "Run",
+    "JUnit.AdminServiceTest.testGetAllPatients.executor": "Run",
+    "JUnit.AppointmentControllerTest.executor": "Run",
+    "JUnit.AppointmentControllerTest.testCancelAppointment_NotFound.executor": "Debug",
+    "JUnit.AppointmentControllerTest.testGetAppointment_NotFound.executor": "Run",
+    "JUnit.AppointmentRepositoryTest.executor": "Run",
+    "JUnit.AppointmentServiceTest.executor": "Run",
+    "JUnit.AppointmentServiceTest.testBookAppointment.executor": "Run",
+    "JUnit.AppointmentServiceTest.testCreateAppointment_DefaultIsDeletedFalse.executor": "Run",
+    "JUnit.AuthControllerTest.executor": "Run",
+    "JUnit.AuthServiceTest.executor": "Run",
+    "JUnit.DoctorControllerTest.executor": "Run",
+    "JUnit.DoctorServiceTest.executor": "Run",
+    "JUnit.NotificationControllerTest.executor": "Run",
+    "JUnit.NotificationServiceTest.executor": "Run",
+    "JUnit.OwnerControllerTest.executor": "Run",
+    "JUnit.OwnerControllerTest.testAddAdmin_Success.executor": "Run",
+    "JUnit.OwnerControllerTest.testViewPatients_Unauthorized.executor": "Run",
+    "JUnit.OwnerServiceTest.executor": "Run",
+    "JUnit.PatientControllerTest.executor": "Run",
+    "JUnit.PatientServiceTest.executor": "Run",
+    "JUnit.UserControllerTest.executor": "Run",
+    "JUnit.UserRepositoryTest.executor": "Run",
+    "JUnit.UserRepositoryTest.testAddDoctorAndPatient.executor": "Run",
+    "JUnit.UserRepositoryTest.testEmailUniqueness.executor": "Run",
+    "JUnit.UserServiceTest.executor": "Run",
+    "Maven.healthcare [clean].executor": "Run",
+    "Maven.healthcare [compile].executor": "Run",
+    "Maven.healthcare [deploy].executor": "Run",
+    "Maven.healthcare [install].executor": "Run",
+    "Maven.healthcare [test].executor": "Run",
+    "Maven.healthcare [verify].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.HealthcareApplication.executor": "Run",
+    "full.screen.before.presentation.mode": "false",
+    "git-widget-placeholder": "new-design-",
+    "jdk.selected.JAVA_MODULE": "openjdk-22",
+    "kotlin-language-version-configured": "true",
+    "last_directory_selection": "C:/Users/Nimish/Desktop/healthcare/src/test/java",
+    "last_opened_file_path": "C:/Users/Nimish/Desktop/healthcare/backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "project.propCompiler",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Nimish\Desktop\healthcare\healthcare-\healthcare\src\main\java\com\example\healthcare" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.example.healthcare.controller" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.HealthcareApplication">
+    <configuration name="HealthcareApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.healthcare.HealthcareApplication" />
+      <module name="healthcare" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.healthcare.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="generated-requests | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" executionIdentifier="#1" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | #2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" executionIdentifier="#2" index="2" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="AdminServiceTest.testGetAllPatients" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="healthcare" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.healthcare.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.example.healthcare.service" />
+      <option name="MAIN_CLASS_NAME" value="com.example.healthcare.service.AdminServiceTest" />
+      <option name="METHOD_NAME" value="testGetAllPatients" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="healthcare" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.healthcare.dto.Message.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.example.healthcare.controller" />
+      <option name="MAIN_CLASS_NAME" value="com.example.healthcare.controller.UserControllerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DemoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="demo" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.demo.DemoApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="HealthcareApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="healthcare" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.healthcare.HealthcareApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.HealthcareApplication" />
+        <item itemvalue="HTTP Request.generated-requests | #2" />
+        <item itemvalue="HTTP Request.generated-requests | #1" />
+        <item itemvalue="JUnit.AdminServiceTest.testGetAllPatients" />
+        <item itemvalue="JUnit.UserControllerTest" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.24978.46" />
+        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-IU-243.24978.46" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="90244cca-aced-4ef7-b3f4-383e4f3fd928" name="Changes" comment="" />
+      <created>1737245324772</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1737245324772</updated>
+      <workItem from="1737245325912" duration="824000" />
+      <workItem from="1737246230654" duration="1649000" />
+      <workItem from="1737428703817" duration="118000" />
+      <workItem from="1737588854265" duration="123000" />
+      <workItem from="1738341140472" duration="22000" />
+      <workItem from="1738341203793" duration="114000" />
+      <workItem from="1738341326224" duration="90000" />
+      <workItem from="1738341430665" duration="40698000" />
+      <workItem from="1738466952808" duration="37000" />
+      <workItem from="1738467020448" duration="60286000" />
+      <workItem from="1741918426704" duration="743000" />
+      <workItem from="1741973340759" duration="2125000" />
+      <workItem from="1744942909773" duration="4395000" />
+      <workItem from="1744991944346" duration="3901000" />
+      <workItem from="1745029428100" duration="817000" />
+      <workItem from="1745382315912" duration="5647000" />
+      <workItem from="1745461507500" duration="52000" />
+      <workItem from="1745864395909" duration="8842000" />
+      <workItem from="1746065553042" duration="14805000" />
+      <workItem from="1747070298013" duration="97000" />
+    </task>
+    <task id="LOCAL-00001" summary="set up">
+      <option name="closed" value="true" />
+      <created>1737246117844</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1737246117844</updated>
+    </task>
+    <task id="LOCAL-00002" summary="set up">
+      <option name="closed" value="true" />
+      <created>1738374323167</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1738374323167</updated>
+    </task>
+    <task id="LOCAL-00003" summary="some tests">
+      <option name="closed" value="true" />
+      <created>1738386462723</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1738386462723</updated>
+    </task>
+    <task id="LOCAL-00004" summary="some tests">
+      <option name="closed" value="true" />
+      <created>1738386480530</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1738386480530</updated>
+    </task>
+    <task id="LOCAL-00005" summary="working with tests, now admin and owner with otp and notifications next step">
+      <option name="closed" value="true" />
+      <created>1738395773199</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1738395773199</updated>
+    </task>
+    <task id="LOCAL-00006" summary="working with tests, now admin and owner with otp and notifications next step">
+      <option name="closed" value="true" />
+      <created>1738526807836</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1738526807836</updated>
+    </task>
+    <task id="LOCAL-00007" summary="admin, owner controllers done and tested">
+      <option name="closed" value="true" />
+      <created>1738541926399</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1738541926399</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Implemented audit logs for system-wide operations, to ensure safety. Next Goal: Splitting Owner and Admin logs accordingly.">
+      <option name="closed" value="true" />
+      <created>1738627184968</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1738627184968</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Tested Postman Successful">
+      <option name="closed" value="true" />
+      <created>1741976878194</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1741976878194</updated>
+    </task>
+    <task id="LOCAL-00010" summary="auth controller, only allowing new patient accounts from signup">
+      <option name="closed" value="true" />
+      <created>1745382346305</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1745382346305</updated>
+    </task>
+    <task id="LOCAL-00011" summary="different methods for past , and future apppointments for patients">
+      <option name="closed" value="true" />
+      <created>1745384468864</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1745384468864</updated>
+    </task>
+    <task id="LOCAL-00012" summary="successfully updated the status of appointment to booked after appointment time has passed and not been cancelled.">
+      <option name="closed" value="true" />
+      <created>1745386962692</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1745386962692</updated>
+    </task>
+    <task id="LOCAL-00013" summary="feat(security): Complete JWT authentication flow with role-based access control and DTO sanitization&#10;&#10;- Integrated secure JWT authentication for Owner, Admin, Doctor, and Patient.&#10;- Added centralized SecurityUtils for authenticated user retrieval.&#10;- Introduced Profile DTOs to hide sensitive fields (passwords, authorities).&#10;- Created ProfileMapper for mapping entities to clean API responses.&#10;- Refactored all user role controllers to use DTOs in profile endpoints.&#10;- Hardened SecurityConfig with fine-grained endpoint access by role.&#10;- Improved JWTAuthenticationFilter for cleaner principal extraction.&#10;- Full login → bearer token → secure authorized API flow tested successfully.">
+      <option name="closed" value="true" />
+      <created>1745871951113</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1745871951113</updated>
+    </task>
+    <task id="LOCAL-00014" summary="feat: messaging across users with read, inbox, sent&#10;Tested By : Postman and Workbench">
+      <option name="closed" value="true" />
+      <created>1746152920608</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1746152920608</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="set up" />
+    <MESSAGE value="some tests" />
+    <MESSAGE value="working with tests, now admin and owner with otp and notifications next step" />
+    <MESSAGE value="admin, owner controllers done and tested" />
+    <MESSAGE value="Implemented audit logs for system-wide operations, to ensure safety. Next Goal: Splitting Owner and Admin logs accordingly." />
+    <MESSAGE value="Tested Postman Successful" />
+    <MESSAGE value="auth controller, only allowing new patient accounts from signup" />
+    <MESSAGE value="different methods for past , and future apppointments for patients" />
+    <MESSAGE value="successfully updated the status of appointment to booked after appointment time has passed and not been cancelled." />
+    <MESSAGE value="feat(security): Complete JWT authentication flow with role-based access control and DTO sanitization&#10;&#10;- Integrated secure JWT authentication for Owner, Admin, Doctor, and Patient.&#10;- Added centralized SecurityUtils for authenticated user retrieval.&#10;- Introduced Profile DTOs to hide sensitive fields (passwords, authorities).&#10;- Created ProfileMapper for mapping entities to clean API responses.&#10;- Refactored all user role controllers to use DTOs in profile endpoints.&#10;- Hardened SecurityConfig with fine-grained endpoint access by role.&#10;- Improved JWTAuthenticationFilter for cleaner principal extraction.&#10;- Full login → bearer token → secure authorized API flow tested successfully." />
+    <MESSAGE value="feat: messaging across users with read, inbox, sent&#10;Tested By : Postman and Workbench" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: messaging across users with read, inbox, sent&#10;Tested By : Postman and Workbench" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="org.springframework.beans.factory.UnsatisfiedDependencyException" package="org.springframework.beans.factory" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
