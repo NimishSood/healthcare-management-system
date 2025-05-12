@@ -1,15 +1,15 @@
-// DoctorLayout.jsx
-import { Outlet } from "react-router-dom";
+import React from 'react'
+import { Outlet, Link } from 'react-router-dom'
 
 export default function OwnerLayout() {
   return (
-    <div>
-      <header>
-        <h1>Owner Dashboard</h1>
+    <div className="min-h-screen p-4 bg-gray-200">
+      <header className="mb-4">
+        <nav className="space-x-4">
+          <Link to="/owner/profile" className="text-red-600 hover:underline">Profile</Link>
+        </nav>
       </header>
-      <main>
-        <Outlet />
-      </main>
+      <Outlet />
     </div>
-  );
+  )
 }

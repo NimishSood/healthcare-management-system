@@ -1,15 +1,15 @@
-// DoctorLayout.jsx
-import { Outlet } from "react-router-dom";
+import React from 'react'
+import { Outlet, Link } from 'react-router-dom'
 
 export default function AdminLayout() {
   return (
-    <div>
-      <header>
-        <h1>Admin Dashboard</h1>
+    <div className="min-h-screen p-4 bg-white">
+      <header className="mb-4">
+        <nav className="space-x-4">
+          <Link to="/admin/dashboard" className="text-purple-600 hover:underline">Dashboard</Link>
+        </nav>
       </header>
-      <main>
-        <Outlet />
-      </main>
+      <Outlet />
     </div>
-  );
+  )
 }
