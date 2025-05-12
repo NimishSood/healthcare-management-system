@@ -88,7 +88,12 @@ public class AuthService {
         String token = jwtService.generateToken(user);
 
         // 🔥 Now return the AuthResponse with the token
-        return new AuthResponse("Login successful", user.getRole().name(), token);
+        return new AuthResponse(
+                "Login successful",
+                user.getRole().name(),
+                token,
+                user
+        );
     }
 
 
@@ -110,6 +115,32 @@ public class AuthService {
         auditLogService.logAction(
                 "Password Reset Requested", email, userOptional.get().getRole().name(),
                 "User requested password reset", null, null
+        );
+    }
+
+    //New
+
+    // Add to AuthService.java
+    public AuthResponse verifyToken(String authHeader) {
+        // Reuse JWT validation from login flow
+        String token = authHeader.replace("Bearer ", "");
+        String email = jwtService.extractUsername(token); // Already validates token signature/expiry
+
+        // Reuse same user lookup as login
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // Reuse audit logging from login
+        auditLogService.logAction(
+                "Token Verified", user.getEmail(), user.getRole().name(),
+                "Session validation", null, null
+        );
+
+        return new AuthResponse(
+                "Token valid",
+                user.getRole().name(),
+                token, // Return same token if needed
+                user
         );
     }
 }

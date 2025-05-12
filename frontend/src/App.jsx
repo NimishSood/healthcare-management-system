@@ -7,10 +7,10 @@ import RegisterPage  from './pages/RegisterPage'
 import NotFoundPage  from './pages/NotFoundPage'
 import PrivateRoute  from './components/PrivateRoute'
 
-import PatientLayout from './layout/PatientLayout'
-import DoctorLayout  from './layout/DoctorLayout'
-import AdminLayout   from './layout/AdminLayout'
-import OwnerLayout   from './layout/OwnerLayout'
+import PatientLayout from './layouts/PatientLayout'
+import DoctorLayout  from './layouts/DoctorLayout'
+import AdminLayout   from './layouts/AdminLayout'
+import OwnerLayout   from './layouts/OwnerLayout'
 
 import TailwindTest from './pages/TailwindTest'
 

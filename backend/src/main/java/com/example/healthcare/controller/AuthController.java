@@ -4,10 +4,13 @@ import com.example.healthcare.dto.Authorization.AuthRequest;
 import com.example.healthcare.dto.Authorization.AuthResponse;
 import com.example.healthcare.entity.User;
 import com.example.healthcare.entity.enums.UserRole;
+import com.example.healthcare.exception.UserNotFoundException;
 import com.example.healthcare.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -43,4 +46,17 @@ public class AuthController
         authService.sendPasswordReset(email);
         return ResponseEntity.ok("Password reset link sent.");
     }
+
+    //NEW
+    // Add to AuthController.java
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String authHeader) {
+        try {
+            return ResponseEntity.ok(authService.verifyToken(authHeader));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Invalid token");
+        }
+    }
+
+
 }
