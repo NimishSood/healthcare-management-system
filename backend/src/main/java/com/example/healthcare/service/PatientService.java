@@ -5,6 +5,7 @@ import com.example.healthcare.exception.PatientNotFoundException;
 import com.example.healthcare.repository.PatientRepository;
 import com.example.healthcare.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
+    private final PasswordEncoder passwordEncoder;
+    private final com.example.healthcare.repository.prescriptionRepository prescriptionRepository;
 
     public Patient getPatientById(Long id) {
         return patientRepository.findByIdAndIsDeletedFalse(id)
@@ -101,4 +104,40 @@ public class PatientService {
                 "Doctor ID: " + doctorId, null, "Message Sent"
         );
     }
+
+    /**
+     * Change the authenticated patient's password.
+     *
+     * @param id           the patient’s ID
+     * @param oldPassword  the current (plain-text) password
+     * @param newPassword  the new (plain-text) password
+     * @throws IllegalArgumentException if the old password does not match
+     */
+    @Transactional
+    public void changePassword(Long id, String oldPassword, String newPassword) {
+        Patient patient = getPatientById(id);
+
+        // Verify old password
+        if (!passwordEncoder.matches(oldPassword, patient.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect.");
+        }
+
+        // Audit previous hash (optional—be mindful of GDPR/security)
+        String previousHash = patient.getPassword();
+
+        // Encode and set new password
+        patient.setPassword(passwordEncoder.encode(newPassword));
+        patientRepository.save(patient);
+
+        // Log the change
+        auditLogService.logAction(
+                "Patient Password Changed",
+                patient.getEmail(),
+                "PATIENT",
+                "Patient ID: " + id,
+                previousHash,
+                patient.getPassword()
+        );
+    }
+
 }

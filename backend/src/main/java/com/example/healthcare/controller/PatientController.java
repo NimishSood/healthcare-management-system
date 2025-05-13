@@ -2,12 +2,14 @@ package com.example.healthcare.controller;
 
 import com.example.healthcare.dto.Profiles.PatientProfileDto;
 import com.example.healthcare.dto.Profiles.ProfileMapper;
+import com.example.healthcare.dto.Profiles.ChangePasswordRequest;
 import com.example.healthcare.entity.Appointment;
 import com.example.healthcare.entity.Patient;
 import com.example.healthcare.security.SecurityUtils;
 import com.example.healthcare.service.AppointmentService;
 import com.example.healthcare.service.PatientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -43,6 +45,18 @@ public class PatientController {
         Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
         patientService.softDeletePatient(authenticatedPatient.getId());
         return "Patient account deleted successfully.";
+    }
+
+    // ✅ Change Password
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest req) {
+        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
+        patientService.changePassword(
+                authenticatedPatient.getId(),
+                req.getOldPassword(),
+                req.getNewPassword()
+        );
+        return ResponseEntity.ok("Password changed successfully.");
     }
 
     // ✅ View Upcoming and Past Appointments
