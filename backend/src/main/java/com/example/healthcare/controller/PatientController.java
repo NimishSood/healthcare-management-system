@@ -217,4 +217,10 @@ public class PatientController {
                 .map(ProfileMapper::toDoctorDto)
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/appointments/cancelled")
+    public List<AppointmentDto> getCancelledAppointments() {
+        Patient p = securityUtils.getAuthenticatedPatient();
+        return appointmentService.getCancelledAppointmentsDto(p.getId());
+    }
 }

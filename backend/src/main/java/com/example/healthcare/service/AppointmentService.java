@@ -93,9 +93,7 @@ public class AppointmentService {
 
             String previousData = appointment.toString();
             appointment.setStatus(AppointmentStatus.CANCELLED);
-            appointment.setDeleted(true);
             appointment.setCancelledBy(user);
-
             appointmentRepository.save(appointment);
 
             auditLogService.logAction(
@@ -195,6 +193,14 @@ public class AppointmentService {
                 : appointmentRepository.findByPatientIdAndAppointmentTimeBefore(userId, LocalDateTime.now());
         return list.stream()
                 .filter(a -> !a.isDeleted())
+                .map(AppointmentMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<AppointmentDto> getCancelledAppointmentsDto(Long patientId) {
+        return appointmentRepository
+                .findByPatientIdAndStatus(patientId, AppointmentStatus.CANCELLED)
+                .stream()
                 .map(AppointmentMapper::toDto)
                 .collect(Collectors.toList());
     }

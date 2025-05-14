@@ -11,9 +11,10 @@ import {
 
 export function AppointmentList() {
   // — Data states —
-  const [upcoming, setUpcoming]     = useState([])
-  const [history,  setHistory]      = useState([])
-  const [loading,  setLoading]      = useState(true)
+  const [upcoming,     setUpcoming]     = useState([])
+  const [history,      setHistory]      = useState([])
+  const [cancelled,    setCancelled]    = useState([]) // newly derived
+  const [loading,      setLoading]      = useState(true)
 
   // — UI states for detail modal & cancelling —
   const [selected,     setSelected]     = useState(null)
@@ -27,12 +28,18 @@ export function AppointmentList() {
   async function loadAppointments() {
     setLoading(true)
     try {
-      const [upRes, histRes] = await Promise.all([
+      const [upRes, histRes, cancelRes] = await Promise.all([
         axios.get('/patient/appointments/upcoming'),
-        axios.get('/patient/appointments/history')
+        axios.get('/patient/appointments/history'),
+        axios.get('/patient/appointments/cancelled')
       ])
       setUpcoming(upRes.data)
       setHistory(histRes.data)
+
+      // Derive cancelled from both arrays (once backend returns CANCELLED items)
+      const all = [...upRes.data, ...histRes.data]
+      setCancelled(all.filter(a => a.status === 'CANCELLED'))
+      setCancelled(cancelRes.data)
     } catch (err) {
       toast.error('Failed to load appointments')
       console.error(err)
@@ -67,7 +74,8 @@ export function AppointmentList() {
       <div className="text-center py-10">
         <svg className="animate-spin h-8 w-8 mx-auto text-gray-500" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          <path className="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"/>
         </svg>
         <p className="mt-2 text-gray-600">Loading appointments…</p>
       </div>
@@ -84,9 +92,11 @@ export function AppointmentList() {
     }
   }
 
+  // — Define all three sections in one place —
   const sections = [
-    { title: 'Upcoming Appointments', data: upcoming },
-    { title: 'Past Appointments',     data: history  },
+    { title: 'Upcoming Appointments', cancellationAllowed: true,  data: upcoming },
+    { title: 'Cancelled Appointments', cancellationAllowed: false, data: cancelled },
+    { title: 'Past Appointments',     cancellationAllowed: false, data: history  },
   ]
 
   return (
@@ -101,7 +111,8 @@ export function AppointmentList() {
         </Link>
       </div>
 
-      {sections.map(({ title, data }) => (
+      {/* — Render each section — */}
+      {sections.map(({ title, data, cancellationAllowed }) => (
         <div key={title} className="bg-white p-6 rounded-xl shadow-sm">
           <h2 className="text-xl font-semibold mb-4">{title}</h2>
           {data.length > 0 ? (
@@ -120,7 +131,7 @@ export function AppointmentList() {
                     </p>
                   </div>
 
-                  {/* — Actions: View / Cancel — */}
+                  {/* — Actions: status, view, (optional) cancel — */}
                   <div className="flex items-center space-x-4">
                     <span className={`px-2 py-1 text-xs rounded-full ${statusClass(appt.status)}`}>
                       {appt.status}
@@ -134,8 +145,8 @@ export function AppointmentList() {
                       View Details
                     </button>
 
-                    {/* Cancel only on upcoming & booked */}
-                    {title === 'Upcoming Appointments' && appt.status === 'BOOKED' && (
+                    {/* Cancel button only in Upcoming section */}
+                    {cancellationAllowed && appt.status === 'BOOKED' && (
                       <button
                         onClick={() => handleCancel(appt.id)}
                         disabled={cancellingId === appt.id}
@@ -176,10 +187,14 @@ export function AppointmentList() {
               <div><dt className="font-medium">Doctor</dt><dd>{selected.doctorName}</dd></div>
               <div><dt className="font-medium">Specialty</dt><dd>{selected.specialty}</dd></div>
               <div><dt className="font-medium">Contact</dt><dd>{selected.doctorContact}</dd></div>
-              <div><dt className="font-medium">When</dt>
-                   <dd>{format(new Date(selected.appointmentTime), 'PPpp')}</dd></div>
-              <div><dt className="font-medium">Booked On</dt>
-                   <dd>{format(new Date(selected.createdAt), 'PPpp')}</dd></div>
+              <div>
+                <dt className="font-medium">When</dt>
+                <dd>{format(new Date(selected.appointmentTime), 'PPpp')}</dd>
+              </div>
+              <div>
+                <dt className="font-medium">Booked On</dt>
+                <dd>{format(new Date(selected.createdAt), 'PPpp')}</dd>
+              </div>
               <div><dt className="font-medium">Status</dt><dd>{selected.status}</dd></div>
               {selected.location && (
                 <div><dt className="font-medium">Location</dt><dd>{selected.location}</dd></div>

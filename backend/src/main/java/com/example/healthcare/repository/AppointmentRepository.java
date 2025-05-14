@@ -39,4 +39,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByDoctorAndAppointmentTimeAfterAndIsDeletedFalse(Doctor doctor, LocalDateTime now);
 
     List<Appointment> findByPatientId(Long patientId);
+
+    // NEW: fetch cancelled (soft‐deleted) appointments for a patient
+    List<Appointment> findByPatientIdAndStatus(Long patientId, AppointmentStatus status);
+
+
+
 }
