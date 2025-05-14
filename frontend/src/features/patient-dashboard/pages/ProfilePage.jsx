@@ -10,7 +10,10 @@ import {
   EyeIcon,
   EyeSlashIcon,
   CheckCircleIcon,
-  XCircleIcon
+  XCircleIcon,
+  ArrowRightOnRectangleIcon,
+  PencilSquareIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import { useNavigate } from 'react-router-dom'
 
@@ -18,25 +21,27 @@ export default function ProfilePage() {
   const { logout } = useAuth()
   const navigate = useNavigate()
 
-  // Profile state
-  const [profile, setProfile] = useState({
+  // ─── Profile state ─────────────────────────────────────────────────────────
+  const [original, setOriginal] = useState(null)
+  const [profile, setProfile]   = useState({
     firstName: '',
     lastName: '',
     email: '',
     phoneNumber: '',
     insuranceProvider: ''
   })
-  const [loadingProfile, setLoadingProfile] = useState(true)
+  const [editing, setEditing]       = useState(false)
   const [profileMsg, setProfileMsg] = useState('')
+  const [loading, setLoading]       = useState(true)
 
-  // Password state
-  const [pwData, setPwData] = useState({
+  // ─── Password state ─────────────────────────────────────────────────────────
+  const [pwData, setPwData]       = useState({
     oldPassword: '',
     newPassword: '',
     confirmNew: ''
   })
-  const [showPw, setShowPw] = useState(false)
-  const [pwValid, setPwValid] = useState({
+  const [showPw, setShowPw]       = useState(false)
+  const [pwValid, setPwValid]     = useState({
     minLength: false,
     hasUpper: false,
     hasLower: false,
@@ -44,54 +49,65 @@ export default function ProfilePage() {
     hasSpecial: false,
     matchesConfirm: false
   })
-  const [pwMsg, setPwMsg] = useState('')
+  const [pwMsg, setPwMsg]         = useState('')
   const [changingPw, setChangingPw] = useState(false)
 
   const specialChars = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/
 
-  // Load profile
+  // ─── Load profile ───────────────────────────────────────────────────────────
   useEffect(() => {
-    axios
-      .get('/patient/profile')
+    axios.get('/patient/profile')
       .then(res => {
         const d = res.data
-        setProfile({
-          firstName:        d.firstName ?? '',
-          lastName:         d.lastName  ?? '',
-          email:            d.email     ?? '',
-          phoneNumber:      d.phoneNumber      ?? '',
-          insuranceProvider:d.insuranceProvider ?? ''
-        })
+        const norm = {
+          firstName:        d.firstName || '',
+          lastName:         d.lastName  || '',
+          email:            d.email     || '',
+          phoneNumber:      d.phoneNumber      || '',
+          insuranceProvider:d.insuranceProvider || ''
+        }
+        setOriginal(norm)
+        setProfile(norm)
       })
       .catch(console.error)
-      .finally(() => setLoadingProfile(false))
+      .finally(() => setLoading(false))
   }, [])
 
-  // Validate password
+  // ─── Validate new password ──────────────────────────────────────────────────
   useEffect(() => {
     const p = pwData.newPassword
     setPwValid({
-      minLength:     p.length >= 8,
-      hasUpper:      /[A-Z]/.test(p),
-      hasLower:      /[a-z]/.test(p),
-      hasNumber:     /\d/.test(p),
-      hasSpecial:    specialChars.test(p),
-      matchesConfirm:p === pwData.confirmNew && p !== ''
+      minLength:      p.length >= 8,
+      hasUpper:       /[A-Z]/.test(p),
+      hasLower:       /[a-z]/.test(p),
+      hasNumber:      /\d/.test(p),
+      hasSpecial:     specialChars.test(p),
+      matchesConfirm: p === pwData.confirmNew && p !== ''
     })
   }, [pwData.newPassword, pwData.confirmNew])
 
-  // Save profile
+  // ─── Handlers ───────────────────────────────────────────────────────────────
+  const startEdit = () => {
+    setProfileMsg('')
+    setEditing(true)
+  }
+  const cancelEdit = () => {
+    setProfile(original)
+    setProfileMsg('')
+    setEditing(false)
+  }
   const saveProfile = async () => {
     setProfileMsg('')
     try {
       await axios.put('/patient/profile', profile)
+      setOriginal(profile)
       setProfileMsg('Profile updated successfully.')
+      setEditing(false)
     } catch (e) {
       setProfileMsg(e.response?.data || 'Failed to update profile.')
     }
   }
 
-  // Change password
   const changePassword = async () => {
     if (!Object.values(pwValid).every(Boolean)) {
       setPwMsg('Please meet all password requirements.')
@@ -113,7 +129,6 @@ export default function ProfilePage() {
     }
   }
 
-  // Delete account
   const deleteAccount = async () => {
     if (!window.confirm('Delete your account? This cannot be undone.')) return
     try {
@@ -125,13 +140,46 @@ export default function ProfilePage() {
     }
   }
 
-  if (loadingProfile) return <div className="p-6">Loading…</div>
+  if (loading) return <div className="p-6">Loading…</div>
+
+  // Avatar initials
+  const initials = `${profile.firstName[0] || ''}${profile.lastName[0] || ''}`.toUpperCase()
 
   return (
     <div className="space-y-8 p-6">
-      {/* Profile Card */}
+      {/* ─── Profile Card ───────────────────────────────────────────── */}
       <div className="bg-white p-6 rounded-xl shadow">
-        <h2 className="text-2xl font-semibold mb-4">Your Profile</h2>
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center text-lg">
+              {initials}
+            </div>
+            <h2 className="text-2xl font-semibold">Your Profile</h2>
+          </div>
+          <div className="space-x-2">
+            <button
+              onClick={logout}
+              className="inline-flex items-center px-3 py-1 border rounded hover:bg-gray-50"
+            >
+              <ArrowRightOnRectangleIcon className="h-5 w-5 mr-1"/> Logout
+            </button>
+            {editing
+              ? <button
+                  onClick={cancelEdit}
+                  className="inline-flex items-center px-3 py-1 border rounded hover:bg-gray-50"
+                >
+                  <XMarkIcon className="h-5 w-5 mr-1"/> Cancel
+                </button>
+              : <button
+                  onClick={startEdit}
+                  className="inline-flex items-center px-3 py-1 border rounded hover:bg-gray-50"
+                >
+                  <PencilSquareIcon className="h-5 w-5 mr-1"/> Edit Profile
+                </button>
+            }
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* First Name */}
           <div>
@@ -140,7 +188,10 @@ export default function ProfilePage() {
               <UserCircleIcon className="h-5 w-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
               <input
                 type="text"
-                className="w-full pl-10 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                disabled={!editing}
+                className={`w-full pl-10 py-2 border rounded-lg ${
+                  editing ? 'focus:ring focus:ring-blue-200' : 'bg-gray-100 text-gray-600'
+                }`}
                 value={profile.firstName}
                 onChange={e => setProfile({ ...profile, firstName: e.target.value })}
               />
@@ -154,7 +205,10 @@ export default function ProfilePage() {
               <UserCircleIcon className="h-5 w-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
               <input
                 type="text"
-                className="w-full pl-10 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                disabled={!editing}
+                className={`w-full pl-10 py-2 border rounded-lg ${
+                  editing ? 'focus:ring focus:ring-blue-200' : 'bg-gray-100 text-gray-600'
+                }`}
                 value={profile.lastName}
                 onChange={e => setProfile({ ...profile, lastName: e.target.value })}
               />
@@ -168,7 +222,10 @@ export default function ProfilePage() {
               <EnvelopeIcon className="h-5 w-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
               <input
                 type="email"
-                className="w-full pl-10 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                disabled={!editing}
+                className={`w-full pl-10 py-2 border rounded-lg ${
+                  editing ? 'focus:ring focus:ring-blue-200' : 'bg-gray-100 text-gray-600'
+                }`}
                 value={profile.email}
                 onChange={e => setProfile({ ...profile, email: e.target.value })}
               />
@@ -182,7 +239,10 @@ export default function ProfilePage() {
               <PhoneIcon className="h-5 w-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
               <input
                 type="tel"
-                className="w-full pl-10 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                disabled={!editing}
+                className={`w-full pl-10 py-2 border rounded-lg ${
+                  editing ? 'focus:ring focus:ring-blue-200' : 'bg-gray-100 text-gray-600'
+                }`}
                 value={profile.phoneNumber}
                 onChange={e => setProfile({ ...profile, phoneNumber: e.target.value })}
               />
@@ -194,28 +254,33 @@ export default function ProfilePage() {
             <label className="block text-sm font-medium mb-1">Insurance Provider</label>
             <input
               type="text"
-              className="w-full py-2 border rounded-lg focus:ring focus:ring-blue-200"
-              value={profile.insuranceProvider}
-              onChange={e => setProfile({ ...profile, insuranceProvider: e.target.value })}
+                disabled={!editing}
+                className={`w-full py-2 border rounded-lg ${
+                  editing ? 'focus:ring focus:ring-blue-200' : 'bg-gray-100 text-gray-600'
+                }`}
+                value={profile.insuranceProvider}
+                onChange={e => setProfile({ ...profile, insuranceProvider: e.target.value })}
             />
           </div>
         </div>
 
-        <button
-          onClick={saveProfile}
-          className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          Save Changes
-        </button>
+        {editing && (
+          <button
+            onClick={saveProfile}
+            className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Save Changes
+          </button>
+        )}
+
         {profileMsg && (
           <p className="mt-4 text-sm text-green-700">{profileMsg}</p>
         )}
       </div>
 
-      {/* Change Password Card */}
+      {/* ─── Change Password Card ─────────────────────────────────────── */}
       <div className="bg-white p-6 rounded-xl shadow">
         <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Current Password */}
           <div>
@@ -267,9 +332,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Password rules */}
+        {/* Password Rules */}
         <ul className="mt-4 grid grid-cols-2 gap-2 text-sm">
-          {Object.entries(pwValid).map(([k, v]) => (
+          {Object.entries(pwValid).map(([k,v]) => (
             <li key={k} className="flex items-center space-x-2">
               {v
                 ? <CheckCircleIcon className="h-4 w-4 text-green-600"/>
@@ -291,20 +356,23 @@ export default function ProfilePage() {
         <button
           onClick={changePassword}
           disabled={changingPw}
-          className={`mt-6 w-full md:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg
-            ${changingPw ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition`}
+          className={`mt-6 w-full md:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg ${
+            changingPw ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+          } transition`}
         >
           {changingPw ? 'Changing…' : 'Change Password'}
         </button>
 
         {pwMsg && (
-          <p className={`mt-4 text-sm ${pwMsg.startsWith('Password changed') ? 'text-green-700' : 'text-red-600'}`}>
+          <p className={`mt-4 text-sm ${
+            pwMsg.startsWith('Password changed') ? 'text-green-700' : 'text-red-600'
+          }`}>
             {pwMsg}
           </p>
         )}
       </div>
 
-      {/* Delete Account */}
+      {/* ─── Delete Account ───────────────────────────────────────────── */}
       <div className="text-center">
         <button
           onClick={deleteAccount}

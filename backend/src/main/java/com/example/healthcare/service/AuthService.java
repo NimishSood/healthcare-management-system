@@ -4,6 +4,7 @@ import com.example.healthcare.dto.Authorization.AuthRequest;
 import com.example.healthcare.dto.Authorization.AuthResponse;
 import com.example.healthcare.entity.Patient;
 import com.example.healthcare.entity.User;
+import com.example.healthcare.entity.enums.AccountStatus;
 import com.example.healthcare.entity.enums.UserRole;
 import com.example.healthcare.exception.UserNotFoundException;
 import com.example.healthcare.repository.UserRepository;
@@ -21,11 +22,12 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
+    private final AuditLogService auditLogService;
     private final JwtService jwtService;
 
-
-    // ✅ User Registration
+    /**
+     * Register a new patient (only PATIENT role allowed).
+     */
     public void registerUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             auditLogService.logAction(
@@ -34,114 +36,114 @@ public class AuthService {
             );
             throw new IllegalArgumentException("Email is already in use.");
         }
-
-        if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.OWNER || user.getRole() == UserRole.DOCTOR) {
+        if (user.getRole() != UserRole.PATIENT) {
             auditLogService.logAction(
                     "Registration Denied", user.getEmail(), user.getRole().name(),
-                    "User attempted to register", "Reason: Cannot self-register as Admin/Owner/Doctor", null
+                    "User attempted to register", "Reason: Cannot self-register as " + user.getRole(), null
             );
-            throw new IllegalArgumentException("Admins,Owners and Doctors cannot self-register.");
+            throw new IllegalArgumentException("Only patients can self-register.");
         }
 
+        // Encode password & set initial status
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setAccountStatus(AccountStatus.ACTIVE);
 
-        if (user.getRole() == UserRole.PATIENT) {
-            Patient patient = new Patient();
-            patient.setFirstName(user.getFirstName());
-            patient.setLastName(user.getLastName());
-            patient.setEmail(user.getEmail());
-            patient.setPassword(user.getPassword());
-            patient.setPhoneNumber(user.getPhoneNumber());
-            patient.setRole(UserRole.PATIENT);
+        // Persist as Patient subtype
+        Patient patient = new Patient();
+        patient.setFirstName(user.getFirstName());
+        patient.setLastName(user.getLastName());
+        patient.setEmail(user.getEmail());
+        patient.setPassword(user.getPassword());
+        patient.setPhoneNumber(user.getPhoneNumber());
+        patient.setRole(UserRole.PATIENT);
+        patient.setAccountStatus(AccountStatus.ACTIVE);
 
-            userRepository.save(patient);
-        }
+        userRepository.save(patient);
+
         auditLogService.logAction(
                 "Patient Registered", user.getEmail(), user.getRole().name(),
-                "New patient account created", null, user.toString()
+                "New patient account created", null, patient.toString()
         );
     }
 
-    // ✅ User Authentication (Login)
+    /**
+     * Authenticate user and issue JWT.
+     */
     public AuthResponse authenticate(AuthRequest authRequest) {
-        Optional<User> userOptional = userRepository.findByEmail(authRequest.getEmail());
+        User user = userRepository.findByEmailAndIsDeletedFalse(authRequest.getEmail())
+                .orElseThrow(() -> {
+                    auditLogService.logAction(
+                            "Failed Login Attempt", authRequest.getEmail(), "UNKNOWN",
+                            "Invalid login attempt", "Reason: No such user or deleted", null
+                    );
+                    return new UserNotFoundException("Invalid email or password.");
+                });
 
-        if (userOptional.isEmpty() ||
-                !passwordEncoder.matches(authRequest.getPassword(), userOptional.get().getPassword())) {
-
+        if (user.getAccountStatus() == AccountStatus.DEACTIVATED) {
             auditLogService.logAction(
-                    "Failed Login Attempt", authRequest.getEmail(), "UNKNOWN",
-                    "Invalid login attempt", "Reason: Invalid credentials", null
+                    "Blocked Login Attempt", user.getEmail(), user.getRole().name(),
+                    "Invalid login attempt", "Reason: Account deactivated", null
             );
+            throw new IllegalStateException("Account has been deactivated.");
+        }
 
+        if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
+            auditLogService.logAction(
+                    "Failed Login Attempt", user.getEmail(), "UNKNOWN",
+                    "Invalid login attempt", "Reason: Bad credentials", null
+            );
             throw new UserNotFoundException("Invalid email or password.");
         }
 
-        User user = userOptional.get();
-
+        String token = jwtService.generateToken(user);
         auditLogService.logAction(
                 "User Logged In", user.getEmail(), user.getRole().name(),
                 "User successfully authenticated", null, null
         );
 
-        // 🔥 Generate the JWT token here
-        String token = jwtService.generateToken(user);
-
-        // 🔥 Now return the AuthResponse with the token
-        return new AuthResponse(
-                "Login successful",
-                user.getRole().name(),
-                token,
-                user
-        );
+        return new AuthResponse("Login successful", user.getRole().name(), token, user);
     }
 
-
-    // ✅ Forgot Password
+    /**
+     * Simulate sending a password reset email.
+     */
     public void sendPasswordReset(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-
-        if (userOptional.isEmpty()) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
             auditLogService.logAction(
                     "Password Reset Request Failed", email, "UNKNOWN",
                     "User attempted to reset password", "Reason: Email not found", null
             );
             throw new UserNotFoundException("User not found with email: " + email);
         }
-
-        // Simulated password reset (implement actual email logic)
-        System.out.println("Password reset link sent to: " + email);
-
         auditLogService.logAction(
-                "Password Reset Requested", email, userOptional.get().getRole().name(),
+                "Password Reset Requested", email, userOpt.get().getRole().name(),
                 "User requested password reset", null, null
         );
+        // (actual email logic goes here)
     }
 
-    //New
-
-    // Add to AuthService.java
+    /**
+     * Verify an existing JWT and return user details.
+     */
     public AuthResponse verifyToken(String authHeader) {
-        // Reuse JWT validation from login flow
         String token = authHeader.replace("Bearer ", "");
-        String email = jwtService.extractUsername(token); // Already validates token signature/expiry
-
-        // Reuse same user lookup as login
-        User user = userRepository.findByEmail(email)
+        String email = jwtService.extractUsername(token);
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        // Reuse audit logging from login
+        if (user.getAccountStatus() == AccountStatus.DEACTIVATED) {
+            auditLogService.logAction(
+                    "Blocked Token Verification", user.getEmail(), user.getRole().name(),
+                    "Session validation", "Reason: Account deactivated", null
+            );
+            throw new IllegalStateException("Account has been deactivated.");
+        }
+
         auditLogService.logAction(
                 "Token Verified", user.getEmail(), user.getRole().name(),
                 "Session validation", null, null
         );
-
-        return new AuthResponse(
-                "Token valid",
-                user.getRole().name(),
-                token, // Return same token if needed
-                user
-        );
+        return new AuthResponse("Token valid", user.getRole().name(), token, user);
     }
 }
-
