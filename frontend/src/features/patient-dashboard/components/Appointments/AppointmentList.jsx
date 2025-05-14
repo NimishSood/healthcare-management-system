@@ -1,5 +1,4 @@
 // src/features/patient-dashboard/components/Appointments/AppointmentList.jsx
-
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
@@ -8,7 +7,8 @@ export function AppointmentList() {
   const [history, setHistory]   = useState([])
   const [loading, setLoading]   = useState(true)
 
-  const [selected, setSelected] = useState(null)  // the appointment to show in modal
+  // the appointment to show in modal
+  const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -35,6 +35,14 @@ export function AppointmentList() {
     { title: 'Past Appointments',     data: history  },
   ]
 
+  // helper for coloring status pill
+  function statusClass(status) {
+    if (status === 'CANCELLED') return 'bg-red-100 text-red-800'
+    if (status === 'COMPLETED' || status === 'CONFIRMED')
+      return 'bg-green-100 text-green-800'
+    return 'bg-amber-100 text-amber-800'
+  }
+
   return (
     <div className="space-y-8">
       {sections.map(({ title, data }) => (
@@ -55,11 +63,11 @@ export function AppointmentList() {
                     </p>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      appt.status === 'CONFIRMED'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-amber-100 text-amber-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${statusClass(
+                        appt.status
+                      )}`}
+                    >
                       {appt.status}
                     </span>
                     <button
@@ -78,7 +86,7 @@ export function AppointmentList() {
         </div>
       ))}
 
-      {/* Modal */}
+      {/* Detail Modal */}
       {selected && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -91,19 +99,33 @@ export function AppointmentList() {
             <h3 className="text-2xl font-semibold mb-4">
               Appointment Details
             </h3>
-            <dl className="grid grid-cols-1 gap-y-2 text-sm">
+
+            <dl className="grid grid-cols-1 gap-y-3 text-sm">
+              {/* Doctor & Contact */}
               <div>
                 <dt className="font-medium">Doctor</dt>
                 <dd>{selected.doctorName}</dd>
               </div>
               <div>
+                <dt className="font-medium">Doctor Contact</dt>
+                <dd>{selected.doctorContact}</dd>
+              </div>
+
+              {/* Specialty */}
+              <div>
                 <dt className="font-medium">Specialty</dt>
                 <dd>{selected.specialty}</dd>
               </div>
+
+              {/* When */}
               <div>
                 <dt className="font-medium">When</dt>
-                <dd>{new Date(selected.appointmentTime).toLocaleString()}</dd>
+                <dd>
+                  {new Date(selected.appointmentTime).toLocaleString()}
+                </dd>
               </div>
+
+              {/* Booked & Updated */}
               <div>
                 <dt className="font-medium">Booked On</dt>
                 <dd>{new Date(selected.createdAt).toLocaleString()}</dd>
@@ -112,6 +134,30 @@ export function AppointmentList() {
                 <dt className="font-medium">Last Updated</dt>
                 <dd>{new Date(selected.updatedAt).toLocaleString()}</dd>
               </div>
+
+              {/* Location & Notes (optional) */}
+              {selected.location && (
+                <div>
+                  <dt className="font-medium">Location</dt>
+                  <dd>{selected.location}</dd>
+                </div>
+              )}
+              {selected.notes && (
+                <div>
+                  <dt className="font-medium">Reason / Notes</dt>
+                  <dd>{selected.notes}</dd>
+                </div>
+              )}
+
+              {/* Cancelled By */}
+              {selected.cancelledByName && (
+                <div>
+                  <dt className="font-medium">Cancelled By</dt>
+                  <dd>{selected.cancelledByName}</dd>
+                </div>
+              )}
+
+              {/* Status */}
               <div>
                 <dt className="font-medium">Status</dt>
                 <dd>{selected.status}</dd>

@@ -41,6 +41,12 @@ public class Appointment {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    private String location;
+
+    @Column(nullable = false)
+    private String notes;
+
     @ManyToOne
     @JoinColumn(name = "cancelled_by", nullable = true)
     private User cancelledBy;
@@ -55,8 +61,6 @@ public class Appointment {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-
 
 
 
