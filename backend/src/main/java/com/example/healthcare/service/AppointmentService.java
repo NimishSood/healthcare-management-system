@@ -23,45 +23,56 @@ import java.util.stream.Collectors;
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
-    private final DoctorRepository doctorRepository;
-    private final PatientRepository patientRepository;
-    private final UserRepository userRepository;
-    private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
+    private final DoctorRepository    doctorRepository;
+    private final PatientRepository   patientRepository;
+    private final UserRepository      userRepository;
+    private final AuditLogService     auditLogService; // ✅ Injected Audit Log Service
 
     // ✅ Patient Books an Appointment
     @Transactional
     public void bookAppointment(Long patientId, Long doctorId, LocalDateTime appointmentTime) {
+        // --- Fetch and validate patient & doctor ---
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new IllegalArgumentException("Patient not found."));
-
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new IllegalArgumentException("Doctor not found."));
 
-        // ✅ Ensure appointment time is in the future
+        // --- Ensure appointment time is in the future ---
         if (appointmentTime.isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("You cannot book an appointment in the past.");
         }
 
-        // ✅ Check if the doctor is already booked for that time
+        // --- Prevent double-booking ---
         if (appointmentRepository.existsByDoctorIdAndAppointmentTime(doctorId, appointmentTime)) {
             throw new IllegalArgumentException("This time slot is already booked.");
         }
 
-        // ✅ Create and save the appointment
+        // --- Create and populate appointment entity ---
         Appointment appointment = new Appointment();
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
         appointment.setAppointmentTime(appointmentTime);
         appointment.setStatus(AppointmentStatus.BOOKED);
 
+        // ✨ **IMPORTANT FIX** ✨
+        // Provide non-null defaults for columns defined NOT NULL in the database.
+        // Otherwise, MySQL will throw a constraint violation if they remain null.
+        appointment.setLocation(""); // empty string instead of null
+        appointment.setNotes("");    // empty string instead of null
+
+        // --- Persist to DB ---
         appointmentRepository.save(appointment);
 
+        // --- Audit log ---
         auditLogService.logAction(
-                "Appointment Booked", patient.getEmail(), "PATIENT",
-                "Doctor ID: " + doctorId, null, "Appointment Time: " + appointmentTime
+                "Appointment Booked",
+                patient.getEmail(),
+                "PATIENT",
+                "Doctor ID: " + doctorId,
+                null,
+                "Appointment Time: " + appointmentTime
         );
     }
-
 
     // ✅ Cancel Appointment (Patients & Admins)
     @Transactional
@@ -76,10 +87,11 @@ public class AppointmentService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
 
-        // ✅ Only the patient or the doctor assigned to the appointment can cancel it
-        if (appointment.getPatient().getId().equals(userId) || appointment.getDoctor().getId().equals(userId)) {
-            String previousData = appointment.toString();
+        // Only patient or doctor can cancel
+        if (appointment.getPatient().getId().equals(userId) ||
+                appointment.getDoctor().getId().equals(userId)) {
 
+            String previousData = appointment.toString();
             appointment.setStatus(AppointmentStatus.CANCELLED);
             appointment.setDeleted(true);
             appointment.setCancelledBy(user);
@@ -87,11 +99,16 @@ public class AppointmentService {
             appointmentRepository.save(appointment);
 
             auditLogService.logAction(
-                    "Appointment Cancelled", user.getEmail(), user.getRole().name(),
-                    "Appointment ID: " + appointmentId, previousData, "Status: CANCELLED"
+                    "Appointment Cancelled",
+                    user.getEmail(),
+                    user.getRole().name(),
+                    "Appointment ID: " + appointmentId,
+                    previousData,
+                    "Status: CANCELLED"
             );
         } else {
-            throw new UnauthorizedAccessException("Only the assigned doctor or patient can cancel this appointment.");
+            throw new UnauthorizedAccessException(
+                    "Only the assigned doctor or patient can cancel this appointment.");
         }
     }
 
@@ -116,7 +133,8 @@ public class AppointmentService {
                 .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found."));
 
         if (!appointment.getDoctor().getId().equals(doctorId)) {
-            throw new UnauthorizedAccessException("Doctors can only complete their own appointments.");
+            throw new UnauthorizedAccessException(
+                    "Doctors can only complete their own appointments.");
         }
 
         if (appointment.getAppointmentTime().isAfter(LocalDateTime.now())) {
@@ -128,68 +146,56 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
 
         auditLogService.logAction(
-                "Appointment Completed", appointment.getDoctor().getEmail(), "DOCTOR",
-                "Appointment ID: " + appointmentId, previousData, "Status: COMPLETED"
+                "Appointment Completed",
+                appointment.getDoctor().getEmail(),
+                "DOCTOR",
+                "Appointment ID: " + appointmentId,
+                previousData,
+                "Status: COMPLETED"
         );
     }
 
-    // ✅ Get All Appointments (Admins & Owners Only)
+    // ✅ Other methods unchanged...
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
-
-    // ✅ Get All Appointments for a Specific Patient
     public List<Appointment> getUpcomingAppointmentsByPatient(Long patientId) {
         return appointmentRepository.findByPatientIdAndAppointmentTimeAfter(patientId, LocalDateTime.now());
     }
-
     public List<Appointment> getPastAppointmentsByPatient(Long patientId) {
-        List<Appointment> pastAppointments = appointmentRepository
-                .findByPatientIdAndAppointmentTimeBefore(patientId, LocalDateTime.now());
-
-        for (Appointment appointment : pastAppointments) {
-            if (appointment.getStatus().equals(AppointmentStatus.BOOKED)
-                    && appointment.getAppointmentTime().isBefore(LocalDateTime.now())) {
-                appointment.setStatus(AppointmentStatus.COMPLETED);
-                appointmentRepository.save(appointment); // 🔄 persists to DB
+        List<Appointment> pastAppointments =
+                appointmentRepository.findByPatientIdAndAppointmentTimeBefore(patientId, LocalDateTime.now());
+        for (Appointment appt : pastAppointments) {
+            if (appt.getStatus() == AppointmentStatus.BOOKED
+                    && appt.getAppointmentTime().isBefore(LocalDateTime.now())) {
+                appt.setStatus(AppointmentStatus.COMPLETED);
+                appointmentRepository.save(appt);
             }
         }
-
         return pastAppointments;
     }
-
-
-
-    // ✅ Get All Upcoming Appointments for a Doctor
     public List<Appointment> getUpcomingAppointments(User doctor) {
         return appointmentRepository.findByDoctorIdAndAppointmentTimeAfter(doctor.getId(), LocalDateTime.now());
     }
-
     public List<Appointment> getPastAppointments(User doctor) {
         return appointmentRepository.findByDoctorIdAndAppointmentTimeBefore(doctor.getId(), LocalDateTime.now());
     }
-
-
     public List<AppointmentDto> getUpcomingAppointmentsDto(Long userId, boolean isDoctor) {
         List<Appointment> list = isDoctor
                 ? appointmentRepository.findByDoctorIdAndAppointmentTimeAfter(userId, LocalDateTime.now())
                 : appointmentRepository.findByPatientIdAndAppointmentTimeAfter(userId, LocalDateTime.now());
-
         return list.stream()
                 .filter(a -> !a.isDeleted())
                 .map(AppointmentMapper::toDto)
                 .collect(Collectors.toList());
     }
-
     public List<AppointmentDto> getPastAppointmentsDto(Long userId, boolean isDoctor) {
         List<Appointment> list = isDoctor
                 ? appointmentRepository.findByDoctorIdAndAppointmentTimeBefore(userId, LocalDateTime.now())
                 : appointmentRepository.findByPatientIdAndAppointmentTimeBefore(userId, LocalDateTime.now());
-
         return list.stream()
                 .filter(a -> !a.isDeleted())
                 .map(AppointmentMapper::toDto)
                 .collect(Collectors.toList());
     }
-
 }
