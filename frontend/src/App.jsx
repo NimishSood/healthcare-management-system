@@ -19,13 +19,18 @@ import DoctorLayout     from './features/doctor-dashboard/layouts/DoctorLayout'
 import AdminLayout      from './features/admin-dashboard/layouts/AdminLayout'
 import OwnerLayout      from './features/owner-dashboard/layouts/OwnerLayout'
 
+import { Toaster } from 'react-hot-toast'
+import BookAppointmentPage from './features/patient-dashboard/pages/BookAppointmentPage'
 export default function App() {
   return (
     <AuthProvider>
+      {/* Toast container for react-hot-toast */}
+      <Toaster position="top-right" />
+
       <Routes>
         {/* public */}
-        <Route path="/"        element={<HomePage />} />
-        <Route path="/login"   element={<LoginPage />} />
+        <Route path="/"         element={<HomePage />} />
+        <Route path="/login"    element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
         {/* protected: patient */}
@@ -39,6 +44,7 @@ export default function App() {
         >
           <Route index                element={<DashboardHome />} />
           <Route path="appointments"  element={<AppointmentList />} />
+          <Route path="appointments/book"  element={<BookAppointmentPage />} />
           <Route path="prescriptions" element={<PrescriptionsPage />} />
           <Route path="profile"       element={<ProfilePage />} />
         </Route>

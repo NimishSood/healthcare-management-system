@@ -42,4 +42,11 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok("User deleted successfully");
     }
+
+    // ➕ NEW: GET all doctors
+    @GetMapping("/doctors")
+    public ResponseEntity<List<User>> getAllDoctors() {
+        List<User> doctors = userService.getDoctors();
+        return ResponseEntity.ok(doctors);
+    }
 }

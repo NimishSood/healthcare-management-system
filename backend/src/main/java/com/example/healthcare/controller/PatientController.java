@@ -1,13 +1,14 @@
 package com.example.healthcare.controller;
 
 import com.example.healthcare.dto.Appointments.AppointmentDto;
+import com.example.healthcare.dto.Profiles.ChangePasswordRequest;
+import com.example.healthcare.dto.Profiles.DoctorProfileDto;
 import com.example.healthcare.dto.Profiles.PatientProfileDto;
 import com.example.healthcare.dto.Profiles.ProfileMapper;
-import com.example.healthcare.dto.Profiles.ChangePasswordRequest;
-import com.example.healthcare.entity.Appointment;
 import com.example.healthcare.entity.Patient;
 import com.example.healthcare.security.SecurityUtils;
 import com.example.healthcare.service.AppointmentService;
+import com.example.healthcare.service.DoctorService;
 import com.example.healthcare.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/patient")
@@ -24,113 +26,192 @@ public class PatientController {
     private final PatientService patientService;
     private final AppointmentService appointmentService;
     private final SecurityUtils securityUtils;
+    private final DoctorService doctorService;
 
-    // ✅ View Patient Profile
+    /**
+     * GET /patient/profile
+     * Returns the authenticated patient's profile information.
+     */
     @GetMapping("/profile")
     public PatientProfileDto getPatientProfile() {
         Patient patient = securityUtils.getAuthenticatedPatient();
         return ProfileMapper.toPatientDto(patient);
     }
 
-    // ✅ Update Profile
+    /**
+     * PUT /patient/profile
+     * Updates the authenticated patient's profile.
+     */
     @PutMapping("/profile")
-    public String updatePatientProfile(@RequestBody Patient patient) {
-        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
-        patientService.updatePatient(authenticatedPatient.getId(), patient);
+    public String updatePatientProfile(@RequestBody Patient updated) {
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        patientService.updatePatient(patient.getId(), updated);
         return "Patient profile updated successfully.";
     }
 
-    // ✅ Soft Delete Account
+    /**
+     * DELETE /patient/delete-account
+     * Soft-deletes the authenticated patient's account.
+     */
     @DeleteMapping("/delete-account")
     public String deletePatientAccount() {
-        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
-        patientService.softDeletePatient(authenticatedPatient.getId());
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        patientService.softDeletePatient(patient.getId());
         return "Patient account deleted successfully.";
     }
 
-    // ✅ Change Password
+    /**
+     * POST /patient/change-password
+     * Changes password for the authenticated patient.
+     */
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest req) {
-        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
+        Patient patient = securityUtils.getAuthenticatedPatient();
         patientService.changePassword(
-                authenticatedPatient.getId(),
+                patient.getId(),
                 req.getOldPassword(),
                 req.getNewPassword()
         );
         return ResponseEntity.ok("Password changed successfully.");
     }
 
-//    // ✅ View Upcoming and Past Appointments
-//    @GetMapping("/appointments/upcoming")
-//    public List<Appointment> getUpcomingAppointments() {
-//        Patient patient = securityUtils.getAuthenticatedPatient();
-//        return appointmentService.getUpcomingAppointmentsByPatient(patient.getId());
-//    }
-//
-//    @GetMapping("/appointments/history")
-//    public List<Appointment> getPastAppointments() {
-//        Patient patient = securityUtils.getAuthenticatedPatient();
-//        return appointmentService.getPastAppointmentsByPatient(patient.getId());
-//    }
-
+    /**
+     * POST /patient/appointments/book
+     * Books a new appointment for the authenticated patient.
+     *
+     * @param doctorId        ID of the doctor to book with
+     * @param appointmentTime Appointment time as a LocalDateTime
+     */
     @PostMapping("/appointments/book")
-    public String bookAppointment(@RequestParam Long doctorId,
-                                  @RequestParam LocalDateTime appointmentTime) {
-        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
-        appointmentService.bookAppointment(authenticatedPatient.getId(), doctorId, appointmentTime);
+    public String bookAppointment(
+            @RequestParam Long doctorId,
+            @RequestParam LocalDateTime appointmentTime
+    ) {
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        appointmentService.bookAppointment(patient.getId(), doctorId, appointmentTime);
         return "Appointment booked successfully.";
     }
 
-    // ✅ Cancel an Appointment
+    /**
+     * DELETE /patient/appointments/cancel
+     * Cancels an existing appointment.
+     *
+     * @param appointmentId ID of the appointment to cancel
+     */
     @DeleteMapping("/appointments/cancel")
     public String cancelAppointment(@RequestParam Long appointmentId) {
-        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
-        appointmentService.cancelAppointment(authenticatedPatient.getId(), appointmentId);
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        appointmentService.cancelAppointment(patient.getId(), appointmentId);
         return "Appointment cancelled successfully.";
     }
 
-    // ✅ View Prescriptions
+    /**
+     * GET /patient/prescriptions
+     * Returns all prescriptions for the authenticated patient.
+     */
     @GetMapping("/prescriptions")
     public List<?> getPatientPrescriptions() {
-        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
-        return patientService.getPrescriptions(authenticatedPatient.getId());
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        return patientService.getPrescriptions(patient.getId());
     }
 
-    // ✅ Request a Prescription Refill
+    /**
+     * POST /patient/prescriptions/request-refill
+     * Requests a refill for a given prescription.
+     *
+     * @param prescriptionId ID of the prescription
+     */
     @PostMapping("/prescriptions/request-refill")
     public String requestPrescriptionRefill(@RequestParam Long prescriptionId) {
-        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
-        patientService.requestRefill(authenticatedPatient.getId(), prescriptionId);
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        patientService.requestRefill(patient.getId(), prescriptionId);
         return "Prescription refill request submitted.";
     }
 
-    // ✅ View Messages
+    /**
+     * GET /patient/messages
+     * Returns all messages for the authenticated patient.
+     */
     @GetMapping("/messages")
     public List<?> getPatientMessages() {
-        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
-        return patientService.getMessages(authenticatedPatient.getId());
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        return patientService.getMessages(patient.getId());
     }
 
-    // ✅ Send Message to Doctor
+    /**
+     * POST /patient/messages/send
+     * Sends a message from the authenticated patient to a doctor.
+     *
+     * @param doctorId ID of the doctor
+     * @param message  Message text in the request body
+     */
     @PostMapping("/messages/send")
-    public String sendMessageToDoctor(@RequestParam Long doctorId,
-                                      @RequestBody String message) {
-        Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
-        patientService.sendMessage(authenticatedPatient.getId(), doctorId, message);
+    public String sendMessageToDoctor(
+            @RequestParam Long doctorId,
+            @RequestBody String message
+    ) {
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        patientService.sendMessage(patient.getId(), doctorId, message);
         return "Message sent successfully.";
     }
 
-
-
+    /**
+     * GET /patient/appointments/upcoming?limit={n}
+     * Returns upcoming appointments, optionally limited to the first n.
+     */
     @GetMapping("/appointments/upcoming")
-    public List<AppointmentDto> getUpcomingAppointmentsDto() {
+    public List<AppointmentDto> getUpcomingAppointments(
+            @RequestParam(value = "limit", required = false) Integer limit
+    ) {
         Patient patient = securityUtils.getAuthenticatedPatient();
-        return appointmentService.getUpcomingAppointmentsDto(patient.getId(), false);
+        List<AppointmentDto> all = appointmentService
+                .getUpcomingAppointmentsDto(patient.getId(), false);
+
+        if (limit != null && limit > 0) {
+            return all.stream().limit(limit).collect(Collectors.toList());
+        }
+        return all;
     }
 
+    /**
+     * GET /patient/appointments/history?since={ISO_DATE_TIME}
+     * Returns past appointments, optionally filtering from a given timestamp.
+     */
     @GetMapping("/appointments/history")
-    public List<AppointmentDto> getPastAppointmentsDto() {
+    public List<AppointmentDto> getPastAppointments(
+            @RequestParam(value = "since", required = false) String since
+    ) {
         Patient patient = securityUtils.getAuthenticatedPatient();
-        return appointmentService.getPastAppointmentsDto(patient.getId(), false);
+        List<AppointmentDto> all = appointmentService
+                .getPastAppointmentsDto(patient.getId(), false);
+
+        if (since != null) {
+            LocalDateTime cutoff = LocalDateTime.parse(since);
+            return all.stream()
+                    .filter(a -> a.getAppointmentTime().isAfter(cutoff))
+                    .collect(Collectors.toList());
+        }
+        return all;
+    }
+
+    /**
+     * GET /patient/prescriptions/pending/count
+     * Returns the number of pending prescription refills for the authenticated patient.
+     */
+    @GetMapping("/prescriptions/pending/count")
+    public long countPendingRefills() {
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        return patientService.countPendingRefills(patient.getId());
+    }
+
+    /**
+     * GET /patient/doctors
+     * Returns a list of all active doctors (profile DTOs).
+     */
+    @GetMapping("/doctors")
+    public List<DoctorProfileDto> listDoctors() {
+        return doctorService.getAllDoctors().stream()
+                .map(ProfileMapper::toDoctorDto)
+                .collect(Collectors.toList());
     }
 }

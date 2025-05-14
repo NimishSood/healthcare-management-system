@@ -41,7 +41,7 @@ public class Appointment {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
+    @Column()
     private String location;
 
     @Column(nullable = false)

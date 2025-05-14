@@ -1,6 +1,7 @@
 package com.example.healthcare.service;
 
 import com.example.healthcare.entity.User;
+import com.example.healthcare.entity.enums.UserRole;
 import com.example.healthcare.exception.UserNotFoundException;
 import com.example.healthcare.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -59,5 +60,9 @@ public class UserService {
     public User getUserById(Long id) {
         return userRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id " + id));
+    }
+
+    public List<User> getDoctors() {
+        return userRepository.findByRoleAndIsDeletedFalse(UserRole.DOCTOR);
     }
 }

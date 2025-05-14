@@ -140,4 +140,19 @@ public class PatientService {
         );
     }
 
+    public long countPendingRefills(Long patientId) {
+        // attempt to fetch prescriptions (may be empty or not yet implemented)
+        List<?> prescriptions;
+        try {
+            prescriptions = getPrescriptions(patientId);
+        } catch (Exception e) {
+            // if getPrescriptions is not implemented or fails, swallow and return 0
+            return 0L;
+        }
+        if (prescriptions == null) {
+            return 0L;
+        }
+        // stub: assume none are pending until you add real criteria
+        return 0L;
+    }
 }

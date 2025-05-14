@@ -14,17 +14,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class DoctorService {
 
-    private final DoctorRepository doctorRepository;
+    private final  DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
     private final prescriptionRepository prescriptionRepository;
     private final MessageRepository messageRepository;
     private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
+
+
 
     @Transactional
     public void updateDoctorProfile(Doctor doctor, Doctor updatedDoctor) {
@@ -114,7 +117,13 @@ public class DoctorService {
         );
     }
 
-    public List<?> getPrescriptions(Long id) {
+    public List<Doctor> getAllDoctors()
+    {
+        return doctorRepository.findAllByIsDeletedFalse();
+    }
+
+    public List<?> getPrescriptions(Long id)
+    {
         return null;
     }
 }
