@@ -98,12 +98,15 @@ public class PatientController {
      *
      * @param appointmentId ID of the appointment to cancel
      */
+
     @DeleteMapping("/appointments/cancel")
-    public String cancelAppointment(@RequestParam Long appointmentId) {
+    public ResponseEntity<Void> cancelAppointment(@RequestParam Long appointmentId) {
         Patient patient = securityUtils.getAuthenticatedPatient();
         appointmentService.cancelAppointment(patient.getId(), appointmentId);
-        return "Appointment cancelled successfully.";
+        // Return 204 No Content so the UI knows it succeeded without payload
+        return ResponseEntity.noContent().build();
     }
+
 
     /**
      * GET /patient/prescriptions
