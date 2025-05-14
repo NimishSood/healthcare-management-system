@@ -1,5 +1,6 @@
 package com.example.healthcare.controller;
 
+import com.example.healthcare.dto.Appointments.AppointmentDto;
 import com.example.healthcare.dto.Profiles.PatientProfileDto;
 import com.example.healthcare.dto.Profiles.ProfileMapper;
 import com.example.healthcare.dto.Profiles.ChangePasswordRequest;
@@ -59,18 +60,18 @@ public class PatientController {
         return ResponseEntity.ok("Password changed successfully.");
     }
 
-    // ✅ View Upcoming and Past Appointments
-    @GetMapping("/appointments/upcoming")
-    public List<Appointment> getUpcomingAppointments() {
-        Patient patient = securityUtils.getAuthenticatedPatient();
-        return appointmentService.getUpcomingAppointmentsByPatient(patient.getId());
-    }
-
-    @GetMapping("/appointments/history")
-    public List<Appointment> getPastAppointments() {
-        Patient patient = securityUtils.getAuthenticatedPatient();
-        return appointmentService.getPastAppointmentsByPatient(patient.getId());
-    }
+//    // ✅ View Upcoming and Past Appointments
+//    @GetMapping("/appointments/upcoming")
+//    public List<Appointment> getUpcomingAppointments() {
+//        Patient patient = securityUtils.getAuthenticatedPatient();
+//        return appointmentService.getUpcomingAppointmentsByPatient(patient.getId());
+//    }
+//
+//    @GetMapping("/appointments/history")
+//    public List<Appointment> getPastAppointments() {
+//        Patient patient = securityUtils.getAuthenticatedPatient();
+//        return appointmentService.getPastAppointmentsByPatient(patient.getId());
+//    }
 
     @PostMapping("/appointments/book")
     public String bookAppointment(@RequestParam Long doctorId,
@@ -117,5 +118,19 @@ public class PatientController {
         Patient authenticatedPatient = securityUtils.getAuthenticatedPatient();
         patientService.sendMessage(authenticatedPatient.getId(), doctorId, message);
         return "Message sent successfully.";
+    }
+
+
+
+    @GetMapping("/appointments/upcoming")
+    public List<AppointmentDto> getUpcomingAppointmentsDto() {
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        return appointmentService.getUpcomingAppointmentsDto(patient.getId(), false);
+    }
+
+    @GetMapping("/appointments/history")
+    public List<AppointmentDto> getPastAppointmentsDto() {
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        return appointmentService.getPastAppointmentsDto(patient.getId(), false);
     }
 }

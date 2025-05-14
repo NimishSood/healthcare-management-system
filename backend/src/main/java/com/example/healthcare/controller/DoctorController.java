@@ -1,5 +1,6 @@
 package com.example.healthcare.controller;
 
+import com.example.healthcare.dto.Appointments.AppointmentDto;
 import com.example.healthcare.dto.Profiles.DoctorProfileDto;
 import com.example.healthcare.dto.Profiles.ProfileMapper;
 import com.example.healthcare.entity.Appointment;
@@ -97,4 +98,17 @@ public class DoctorController {
         doctorService.issuePrescription(doctor, patientId, medicationDetails);
         return "Prescription issued successfully.";
     }
+
+
+//    @GetMapping("/appointments/upcoming")
+//    public List<AppointmentDto> getUpcomingAppointmentsDto() {
+//        Patient patient = securityUtils.getAuthenticatedPatient();
+//        return appointmentService.getUpcomingAppointmentsDto(patient.getId(), false);
+//    }
+//
+//    @GetMapping("/appointments/history")
+//    public List<AppointmentDto> getPastAppointmentsDto() {
+//        Patient patient = securityUtils.getAuthenticatedPatient();
+//        return appointmentService.getPastAppointmentsDto(patient.getId(), false);
+//    }
 }

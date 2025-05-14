@@ -1,5 +1,7 @@
 package com.example.healthcare.service;
 
+import com.example.healthcare.dto.Appointments.AppointmentDto;
+import com.example.healthcare.dto.Appointments.AppointmentMapper;
 import com.example.healthcare.entity.*;
 import com.example.healthcare.entity.enums.AppointmentStatus;
 import com.example.healthcare.exception.AppointmentNotFoundException;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -165,4 +168,28 @@ public class AppointmentService {
     public List<Appointment> getPastAppointments(User doctor) {
         return appointmentRepository.findByDoctorIdAndAppointmentTimeBefore(doctor.getId(), LocalDateTime.now());
     }
+
+
+    public List<AppointmentDto> getUpcomingAppointmentsDto(Long userId, boolean isDoctor) {
+        List<Appointment> list = isDoctor
+                ? appointmentRepository.findByDoctorIdAndAppointmentTimeAfter(userId, LocalDateTime.now())
+                : appointmentRepository.findByPatientIdAndAppointmentTimeAfter(userId, LocalDateTime.now());
+
+        return list.stream()
+                .filter(a -> !a.isDeleted())
+                .map(AppointmentMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<AppointmentDto> getPastAppointmentsDto(Long userId, boolean isDoctor) {
+        List<Appointment> list = isDoctor
+                ? appointmentRepository.findByDoctorIdAndAppointmentTimeBefore(userId, LocalDateTime.now())
+                : appointmentRepository.findByPatientIdAndAppointmentTimeBefore(userId, LocalDateTime.now());
+
+        return list.stream()
+                .filter(a -> !a.isDeleted())
+                .map(AppointmentMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
 }
