@@ -179,20 +179,18 @@ public class AppointmentService {
         return appointmentRepository.findByDoctorIdAndAppointmentTimeBefore(doctor.getId(), LocalDateTime.now());
     }
     public List<AppointmentDto> getUpcomingAppointmentsDto(Long userId, boolean isDoctor) {
-        List<Appointment> list = isDoctor
-                ? appointmentRepository.findByDoctorIdAndAppointmentTimeAfter(userId, LocalDateTime.now())
-                : appointmentRepository.findByPatientIdAndAppointmentTimeAfter(userId, LocalDateTime.now());
-        return list.stream()
-                .filter(a -> !a.isDeleted())
+        return appointmentRepository
+                .findByPatientIdAndAppointmentTimeAfter(userId, LocalDateTime.now())
+                .stream()
+                .filter(a -> !a.isDeleted() && a.getStatus() != AppointmentStatus.CANCELLED)  // ← drop cancelled here
                 .map(AppointmentMapper::toDto)
                 .collect(Collectors.toList());
     }
     public List<AppointmentDto> getPastAppointmentsDto(Long userId, boolean isDoctor) {
-        List<Appointment> list = isDoctor
-                ? appointmentRepository.findByDoctorIdAndAppointmentTimeBefore(userId, LocalDateTime.now())
-                : appointmentRepository.findByPatientIdAndAppointmentTimeBefore(userId, LocalDateTime.now());
-        return list.stream()
-                .filter(a -> !a.isDeleted())
+        return appointmentRepository
+                .findByPatientIdAndAppointmentTimeBefore(userId, LocalDateTime.now())
+                .stream()
+                .filter(a -> !a.isDeleted() && a.getStatus() != AppointmentStatus.CANCELLED)  // ← and here
                 .map(AppointmentMapper::toDto)
                 .collect(Collectors.toList());
     }
