@@ -66,6 +66,7 @@ public class SecurityConfig {
                 // 4) URL rules
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/messages/**").authenticated()
                                 .requestMatchers("/patient/profile/change-password").hasRole("PATIENT")
                                 .requestMatchers("/patient/**").hasRole("PATIENT")
 
@@ -73,6 +74,8 @@ public class SecurityConfig {
                                 .requestMatchers("/owner/**").hasRole("OWNER")
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/doctor/**").hasRole("DOCTOR")
+
+
 
 
                         // … your other matchers …

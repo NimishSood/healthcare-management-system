@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,5 +71,18 @@ public class MessageServiceImpl implements MessageService {
         }
         msg.setRead(true);
         messageRepository.save(msg);
+    }
+
+    @Override
+    public List<MessageDto> getMessagesWithUser(Long me, Long userId) {
+        // Fetch all messages where (sender=me and receiver=userId) OR (sender=userId and receiver=me)
+        List<Message> messages = messageRepository
+                .findAllByParticipants(me, userId); // You may need to define this in your repo
+        // Sort messages by timestamp ASC
+        messages.sort(Comparator.comparing(Message::getTimestamp));
+
+        return messages.stream()
+                .map(MessageMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/messages")
+@RequestMapping("/api/messages")
 @RequiredArgsConstructor
 @Validated
 public class MessageController {
@@ -64,5 +64,11 @@ public class MessageController {
         Long me = securityUtils.getAuthenticatedUserId();
         messageService.markAsRead(me, id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/with/{userId}")
+    public List<MessageDto> getMessagesWithUser(@PathVariable Long userId) {
+        Long me = securityUtils.getAuthenticatedUserId();
+        return messageService.getMessagesWithUser(me, userId);
     }
 }

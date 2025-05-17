@@ -11,4 +11,6 @@ public interface MessageService
     List<MessageDto> getInbox(Long userId);
     List<MessageDto> getSent(Long userId);
     void markAsRead(Long userId, Long messageId);
+
+    List<MessageDto> getMessagesWithUser(Long me, Long userId);
 }

@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        // 1) Skip our auth endpoints
+        // 1) Skip auth endpoints
         if (request.getServletPath().startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
@@ -42,9 +42,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
+        System.out.println("AUTH FILTER: Raw JWT: " + token); // <<<<<<<<<<<<<< HERE
+
         String email;
         try {
             email = jwtService.extractUsername(token);
+            System.out.println("AUTH FILTER: Extracted email from JWT: " + email); // <<<<<<<<<<<<<< HERE
         } catch (ExpiredJwtException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT expired");
             return;
@@ -56,6 +59,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 3) Load user, block if deleted or deactivated
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userRepository.findByEmailAndIsDeletedFalse(email).orElse(null);
+            System.out.println("AUTH FILTER: user found? " + (user != null ? user.getId() : "NOT FOUND")); // <<<<<<<<<<< HERE
+
             if (user != null
                     && user.getAccountStatus() != AccountStatus.DEACTIVATED
                     && jwtService.validateToken(token)) {
@@ -72,4 +77,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }
