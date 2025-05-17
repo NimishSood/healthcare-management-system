@@ -64,7 +64,7 @@ public class PatientController {
      * POST /patient/change-password
      * Changes password for the authenticated patient.
      */
-    @PostMapping("/change-password")
+    @PostMapping("/profile/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest req) {
         Patient patient = securityUtils.getAuthenticatedPatient();
         patientService.changePassword(

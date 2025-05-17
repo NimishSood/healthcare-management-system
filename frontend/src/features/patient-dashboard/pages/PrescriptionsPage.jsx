@@ -1,7 +1,7 @@
 // src/features/patient-dashboard/pages/PrescriptionsPage.jsx
 import React, { useEffect, useState } from 'react'
 import { getPrescriptions } from '../../../services/patientService'
-import { PrescriptionCard } from '../components/Appointments/Prescriptions/PrescriptionCard'
+import { PrescriptionCard } from '../components/Prescriptions/PrescriptionCard'
 
 export default function PrescriptionsPage() {
   const [medications, setMedications] = useState([])

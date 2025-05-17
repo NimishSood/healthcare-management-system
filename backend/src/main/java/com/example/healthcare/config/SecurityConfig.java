@@ -66,7 +66,10 @@ public class SecurityConfig {
                 // 4) URL rules
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/patient/profile/change-password").hasRole("PATIENT")
                                 .requestMatchers("/patient/**").hasRole("PATIENT")
+
+
                                 .requestMatchers("/owner/**").hasRole("OWNER")
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/doctor/**").hasRole("DOCTOR")

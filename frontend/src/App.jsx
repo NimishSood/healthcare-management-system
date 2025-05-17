@@ -21,6 +21,7 @@ import OwnerLayout      from './features/owner-dashboard/layouts/OwnerLayout'
 
 import { Toaster } from 'react-hot-toast'
 import BookAppointmentPage from './features/patient-dashboard/pages/BookAppointmentPage'
+import TestPasswordPage from './features/patient-dashboard/pages/TestPasswordPage'
 export default function App() {
   return (
     <AuthProvider>
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/"         element={<HomePage />} />
         <Route path="/login"    element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/test"     element={<TestPasswordPage />} />
 
         {/* protected: patient */}
         <Route
