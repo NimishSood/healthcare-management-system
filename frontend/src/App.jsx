@@ -22,68 +22,71 @@ import OwnerLayout      from './features/owner-dashboard/layouts/OwnerLayout'
 import { Toaster } from 'react-hot-toast'
 import BookAppointmentPage from './features/patient-dashboard/pages/BookAppointmentPage'
 import TestPasswordPage from './features/patient-dashboard/pages/TestPasswordPage'
+import { ThemeProvider } from './context/ThemeContext'
 export default function App() {
   return (
     <AuthProvider>
-      {/* Toast container for react-hot-toast */}
-      <Toaster position="top-right" />
+      <ThemeProvider>
+        {/* Toast container for react-hot-toast */}
+        <Toaster position="top-right" />
 
-      <Routes>
-        {/* public */}
-        <Route path="/"         element={<HomePage />} />
-        <Route path="/login"    element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/test"     element={<TestPasswordPage />} />
+        <Routes>
+          {/* public */}
+          <Route path="/"         element={<HomePage />} />
+          <Route path="/login"    element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/test"     element={<TestPasswordPage />} />
 
-        {/* protected: patient */}
-        <Route
-          path="/patient/*"
-          element={
-            <PrivateRoute allowedRoles={['PATIENT']}>
-              <PatientLayout />
-            </PrivateRoute>
-          }
-        >
-          <Route index                element={<DashboardHome />} />
-          <Route path="appointments"  element={<AppointmentList />} />
-          <Route path="appointments/book"  element={<BookAppointmentPage />} />
-          <Route path="prescriptions" element={<PrescriptionsPage />} />
-          <Route path="profile"       element={<ProfilePage />} />
-        </Route>
+          {/* protected: patient */}
+          <Route
+            path="/patient/*"
+            element={
+              <PrivateRoute allowedRoles={['PATIENT']}>
+                <PatientLayout />
+              </PrivateRoute>
+            }
+          >
+            <Route index                element={<DashboardHome />} />
+            <Route path="appointments"  element={<AppointmentList />} />
+            <Route path="appointments/book"  element={<BookAppointmentPage />} />
+            <Route path="prescriptions" element={<PrescriptionsPage />} />
+            <Route path="profile"       element={<ProfilePage />} />
+          </Route>
 
-        {/* protected: doctor */}
-        <Route
-          path="/doctor/*"
-          element={
-            <PrivateRoute allowedRoles={['DOCTOR']}>
-              <DoctorLayout />
-            </PrivateRoute>
-          }
-        />
+          {/* protected: doctor */}
+          <Route
+            path="/doctor/*"
+            element={
+              <PrivateRoute allowedRoles={['DOCTOR']}>
+                <DoctorLayout />
+              </PrivateRoute>
+            }
+          />
 
-        {/* protected: admin */}
-        <Route
-          path="/admin/*"
-          element={
-            <PrivateRoute allowedRoles={['ADMIN']}>
-              <AdminLayout />
-            </PrivateRoute>
-          }
-        />
+          {/* protected: admin */}
+          <Route
+            path="/admin/*"
+            element={
+              <PrivateRoute allowedRoles={['ADMIN']}>
+                <AdminLayout />
+              </PrivateRoute>
+            }
+          />
 
-        {/* protected: owner */}
-        <Route
-          path="/owner/*"
-          element={
-            <PrivateRoute allowedRoles={['OWNER']}>
-              <OwnerLayout />
-            </PrivateRoute>
-          }
-        />
+          {/* protected: owner */}
+          <Route
+            path="/owner/*"
+            element={
+              <PrivateRoute allowedRoles={['OWNER']}>
+                <OwnerLayout />
+              </PrivateRoute>
+            }
+          />
 
-        {/* catch-all */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          {/* catch-all */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </ThemeProvider>
     </AuthProvider>
   )
 }
