@@ -8,6 +8,7 @@ import LoginPage     from './pages/LoginPage'
 import RegisterPage  from './pages/RegisterPage'
 import NotFoundPage  from './pages/NotFoundPage'
 import PrivateRoute  from './components/PrivateRoute'
+import MessagePage from './components/messaging/MessagePage'
 
 import PatientLayout    from './features/patient-dashboard/layouts/PatientLayout'
 import DashboardHome    from './features/patient-dashboard/pages/DashboardHome'
@@ -23,6 +24,7 @@ import { Toaster } from 'react-hot-toast'
 import BookAppointmentPage from './features/patient-dashboard/pages/BookAppointmentPage'
 import TestPasswordPage from './features/patient-dashboard/pages/TestPasswordPage'
 import { ThemeProvider } from './context/ThemeContext'
+
 export default function App() {
   return (
     <AuthProvider>
@@ -36,6 +38,7 @@ export default function App() {
           <Route path="/login"    element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/test"     element={<TestPasswordPage />} />
+          <Route path="/messages" element={<MessagePage />} />
 
           {/* protected: patient */}
           <Route

@@ -1,4 +1,3 @@
-// src/features/patient-dashboard/layouts/PatientLayout.jsx
 import React from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import {
@@ -17,10 +16,10 @@ export default function PatientLayout() {
   ]
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <aside className="w-64 bg-white shadow-md">
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-blue-800">Patient Portal</h2>
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <aside className="w-64 bg-white dark:bg-gray-800 shadow-md transition-colors">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-blue-800 dark:text-blue-200">Patient Portal</h2>
         </div>
         <nav className="p-4 space-y-2">
           {navItems.map(({ name, path, icon: Icon }) => (
@@ -29,7 +28,7 @@ export default function PatientLayout() {
               to={path}
               className={({ isActive }) =>
                 `flex items-center p-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100 text-gray-700'
+                  isActive ? 'bg-blue-100 dark:bg-gray-700 text-blue-700 dark:text-blue-200' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'
                 }`
               }
             >
@@ -40,7 +39,7 @@ export default function PatientLayout() {
         </nav>
       </aside>
 
-      <main className="flex-1 overflow-auto p-8">
+      <main className="flex-1 overflow-auto p-8 bg-gray-50 dark:bg-gray-900 transition-colors">
         <Outlet />
       </main>
     </div>
