@@ -71,4 +71,11 @@ public class MessageController {
         Long me = securityUtils.getAuthenticatedUserId();
         return messageService.getMessagesWithUser(me, userId);
     }
+
+    @PutMapping("/with/{userId}/read")
+    public ResponseEntity<Void> markConversationAsRead(@PathVariable Long userId) {
+        Long me = securityUtils.getAuthenticatedUserId();
+        messageService.markConversationAsRead(me, userId);
+        return ResponseEntity.ok().build();
+    }
 }

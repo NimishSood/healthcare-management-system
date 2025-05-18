@@ -17,4 +17,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findAllByParticipants(@Param("me") Long me, @Param("other") Long other);
 
     List<Message> findByReceiverIdOrderByTimestampDesc(Long receiverId);
+
+    List<Message> findBySenderIdAndReceiverIdAndIsReadFalse(Long senderId, Long receiverId);
+
+
 }

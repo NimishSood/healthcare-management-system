@@ -13,4 +13,6 @@ public interface MessageService
     void markAsRead(Long userId, Long messageId);
 
     List<MessageDto> getMessagesWithUser(Long me, Long userId);
+
+    void markConversationAsRead(Long me, Long userId);
 }

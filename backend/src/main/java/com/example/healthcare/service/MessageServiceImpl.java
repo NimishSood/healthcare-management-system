@@ -84,4 +84,16 @@ public class MessageServiceImpl implements MessageService {
                 .map(MessageMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public void markConversationAsRead(Long me, Long userId) {
+        // Find all messages where receiver = me and sender = userId and read = false
+        List<Message> unread = messageRepository.findBySenderIdAndReceiverIdAndIsReadFalse(userId, me);
+        for (Message msg : unread) {
+            msg.setRead(true);
+        }
+        messageRepository.saveAll(unread);
+    }
+
 }
