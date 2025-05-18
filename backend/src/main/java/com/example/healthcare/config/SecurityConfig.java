@@ -67,6 +67,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/messages/**").authenticated()
+                                .requestMatchers("/error").permitAll()
                                 .requestMatchers("/api/users/**").authenticated()
 
                                 .requestMatchers("/patient/profile/change-password").hasRole("PATIENT")

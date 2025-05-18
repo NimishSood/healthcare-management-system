@@ -21,8 +21,15 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findBySenderIdAndReceiverIdAndIsReadFalse(Long senderId, Long receiverId);
 
 
-    @Query("SELECT DISTINCT CASE WHEN m.sender.id = :userId THEN m.receiver ELSE m.sender END FROM Message m WHERE m.sender.id = :userId OR m.receiver.id = :userId")
+    @Query(value =
+            "SELECT u.* FROM users u WHERE u.id IN (" +
+                    "   SELECT m.receiver_id FROM messages m WHERE m.sender_id = :userId " +
+                    "   UNION " +
+                    "   SELECT m.sender_id FROM messages m WHERE m.receiver_id = :userId" +
+                    ")",
+            nativeQuery = true)
     List<User> findConversationPartners(Long userId);
+
 
     // Get latest message between two users
     @Query("SELECT m FROM Message m WHERE (m.sender.id = :userId1 AND m.receiver.id = :userId2) OR (m.sender.id = :userId2 AND m.receiver.id = :userId1) ORDER BY m.timestamp DESC")

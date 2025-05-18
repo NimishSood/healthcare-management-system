@@ -88,6 +88,12 @@ public class MessageController {
         return messageService.getMessagingPartners(me);
     }
 
+    @GetMapping("/threads")
+    public List<MessageThreadDto> getMessageThreads() {
+        Long me = securityUtils.getAuthenticatedUserId();
+        return messageService.getMessageThreads(me);
+    }
+
 
 
 
