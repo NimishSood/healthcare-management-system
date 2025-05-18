@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
@@ -14,4 +15,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     @Query("SELECT m FROM Message m WHERE (m.sender.id = :me AND m.receiver.id = :other) OR (m.sender.id = :other AND m.receiver.id = :me)")
     List<Message> findAllByParticipants(@Param("me") Long me, @Param("other") Long other);
+
+    List<Message> findByReceiverIdOrderByTimestampDesc(Long receiverId);
 }

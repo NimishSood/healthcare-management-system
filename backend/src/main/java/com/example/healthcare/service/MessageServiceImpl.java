@@ -43,9 +43,8 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<MessageDto> getInbox(Long userId) {
-        User user = userService.getUserById(userId);
         return messageRepository
-                .findByReceiverOrderByTimestampDesc(user)
+                .findByReceiverIdOrderByTimestampDesc(userId)
                 .stream()
                 .map(MessageMapper::toDto)
                 .collect(Collectors.toList());
