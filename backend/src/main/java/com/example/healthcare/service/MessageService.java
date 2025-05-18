@@ -1,7 +1,9 @@
 package com.example.healthcare.service;
 
 import com.example.healthcare.dto.Message.MessageDto;
+import com.example.healthcare.dto.Message.MessageThreadDto;
 import com.example.healthcare.dto.Message.SendMessageRequest;
+import com.example.healthcare.dto.Profiles.UserProfileDto;
 
 import java.util.List;
 
@@ -15,4 +17,8 @@ public interface MessageService
     List<MessageDto> getMessagesWithUser(Long me, Long userId);
 
     void markConversationAsRead(Long me, Long userId);
+
+    List<UserProfileDto> getMessagingPartners(Long me);
+
+    List<MessageThreadDto> getMessageThreads(Long userId);
 }

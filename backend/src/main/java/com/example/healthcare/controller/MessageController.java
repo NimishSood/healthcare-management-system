@@ -1,6 +1,9 @@
 package com.example.healthcare.controller;
 import com.example.healthcare.dto.Message.MessageDto;
+import com.example.healthcare.dto.Message.MessageThreadDto;
 import com.example.healthcare.dto.Message.SendMessageRequest;
+import com.example.healthcare.dto.Profiles.UserProfileDto;
+import com.example.healthcare.entity.User;
 import com.example.healthcare.service.MessageService;
 import com.example.healthcare.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -78,4 +81,19 @@ public class MessageController {
         messageService.markConversationAsRead(me, userId);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/partners")
+    public List<UserProfileDto> getMessagingPartners() {
+        Long me = securityUtils.getAuthenticatedUserId();
+        return messageService.getMessagingPartners(me);
+    }
+
+
+
+
+
+
+
+
+
 }

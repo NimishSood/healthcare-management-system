@@ -2,11 +2,14 @@ package com.example.healthcare.repository;
 
 import com.example.healthcare.entity.Appointment;
 import com.example.healthcare.entity.Doctor;
+import com.example.healthcare.entity.User;
 import com.example.healthcare.entity.enums.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +45,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // NEW: fetch cancelled (soft‐deleted) appointments for a patient
     List<Appointment> findByPatientIdAndStatus(Long patientId, AppointmentStatus status);
+
+    // Find all unique doctors a patient has had appointments with (non-deleted)
+    @Query("SELECT DISTINCT a.doctor FROM Appointment a WHERE a.patient.id = :patientId AND a.isDeleted = false")
+    List<User> findDoctorsByPatientId(Long patientId);
+
+    // Find all unique patients a doctor has had appointments with (non-deleted)
+    @Query("SELECT DISTINCT a.patient FROM Appointment a WHERE a.doctor.id = :doctorId AND a.isDeleted = false")
+    List<User> findPatientsByDoctorId(Long doctorId);
+
 
 
 
