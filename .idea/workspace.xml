@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90244cca-aced-4ef7-b3f4-383e4f3fd928" name="Changes" comment="feat: messaging across users with read, inbox, sent&#10;Tested By : Postman and Workbench" />
+    <list default="true" id="90244cca-aced-4ef7-b3f4-383e4f3fd928" name="Changes" comment="feat: messaging across users with read, inbox, sent&#10;Tested By : Postman and Workbench">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,7 +27,7 @@
         <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/backend" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -117,11 +119,11 @@
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.HealthcareApplication.executor": "Run",
     "full.screen.before.presentation.mode": "false",
-    "git-widget-placeholder": "new-design-",
+    "git-widget-placeholder": "main",
     "jdk.selected.JAVA_MODULE": "openjdk-22",
     "kotlin-language-version-configured": "true",
     "last_directory_selection": "C:/Users/Nimish/Desktop/healthcare/src/test/java",
-    "last_opened_file_path": "C:/Users/Nimish/Desktop/healthcare/backend",
+    "last_opened_file_path": "C:/Users/Nimish/Desktop/healthcare",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -255,6 +257,7 @@
       <workItem from="1745864395909" duration="8842000" />
       <workItem from="1746065553042" duration="14805000" />
       <workItem from="1747070298013" duration="97000" />
+      <workItem from="1747627974602" duration="31000" />
     </task>
     <task id="LOCAL-00001" summary="set up">
       <option name="closed" value="true" />
