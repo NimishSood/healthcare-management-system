@@ -3,7 +3,7 @@ package com.example.healthcare.service;
 import com.example.healthcare.entity.Patient;
 import com.example.healthcare.exception.PatientNotFoundException;
 import com.example.healthcare.repository.PatientRepository;
-import com.example.healthcare.service.AuditLogService;
+import com.example.healthcare.repository.PrescriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
     private final PasswordEncoder passwordEncoder;
-    private final com.example.healthcare.repository.prescriptionRepository prescriptionRepository;
+    private final PrescriptionRepository prescriptionRepository;
 
     public Patient getPatientById(Long id) {
         return patientRepository.findByIdAndIsDeletedFalse(id)

@@ -24,6 +24,7 @@ import { Toaster } from 'react-hot-toast'
 import BookAppointmentPage from './features/patient-dashboard/pages/BookAppointmentPage'
 import TestPasswordPage from './features/patient-dashboard/pages/TestPasswordPage'
 import { ThemeProvider } from './context/ThemeContext'
+import PrescriptionDetailPage from './features/patient-dashboard/pages/PrescriptionDetailPage'
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/login"    element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/test"     element={<TestPasswordPage />} />
+          <Route path="/prescriptions/:id" element={<PrescriptionDetailPage />} />
         
 
           {/* protected: patient */}
@@ -55,6 +57,9 @@ export default function App() {
             <Route path="prescriptions" element={<PrescriptionsPage />} />
             <Route path="profile"       element={<ProfilePage />} />
             <Route path="messages" element={<MessagePage />} />
+            
+
+
 
           </Route>
 

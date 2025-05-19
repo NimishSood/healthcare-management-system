@@ -7,14 +7,12 @@ import com.example.healthcare.exception.UnauthorizedAccessException;
 import com.example.healthcare.repository.AppointmentRepository;
 import com.example.healthcare.repository.DoctorRepository;
 import com.example.healthcare.repository.MessageRepository;
-import com.example.healthcare.repository.prescriptionRepository;
-import com.example.healthcare.service.AuditLogService;
+import com.example.healthcare.repository.PrescriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -23,7 +21,7 @@ public class DoctorService {
 
     private final  DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
-    private final prescriptionRepository prescriptionRepository;
+    private final PrescriptionRepository prescriptionRepository;
     private final MessageRepository messageRepository;
     private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
 

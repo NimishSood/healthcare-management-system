@@ -5,6 +5,7 @@ import com.example.healthcare.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -77,6 +78,9 @@ public class SecurityConfig {
                                 .requestMatchers("/owner/**").hasRole("OWNER")
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/doctor/**").hasRole("DOCTOR")
+                                .requestMatchers(HttpMethod.POST, "/prescriptions").hasRole("DOCTOR")
+                                .requestMatchers(HttpMethod.DELETE, "/prescriptions/**").hasAnyRole("DOCTOR","ADMIN","OWNER")
+                                .requestMatchers(HttpMethod.GET, "/prescriptions/**").hasAnyRole("DOCTOR","ADMIN","OWNER","PATIENT")
 
 
 

@@ -22,7 +22,7 @@ public class SecurityUtils {
     /**
      * Get the currently authenticated user.
      */
-    private User getAuthenticatedUser() {
+    public User getAuthenticatedUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principal instanceof UserDetails userDetails) {

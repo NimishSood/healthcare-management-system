@@ -54,6 +54,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("SELECT DISTINCT a.patient FROM Appointment a WHERE a.doctor.id = :doctorId AND a.isDeleted = false")
     List<User> findPatientsByDoctorId(Long doctorId);
 
+    boolean existsByDoctorIdAndPatientIdAndIsDeletedFalse(Long doctorId, Long patientId);
+
+
 
 
 

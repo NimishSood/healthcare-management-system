@@ -17,7 +17,9 @@ export default function PatientLayout() {
     { name: 'Appointments',  path: '/patient/appointments',  icon: CalendarDaysIcon },
     { name: 'Prescriptions', path: '/patient/prescriptions', icon: ClipboardDocumentIcon },
     { name: 'Profile',       path: '/patient/profile',       icon: UserCircleIcon },
-    { name: 'Messages', path: '/patient/messages', icon: ChatBubbleLeftRightIcon }
+    { name: 'Messages', path: '/patient/messages', icon: ChatBubbleLeftRightIcon },
+    
+
   ]
 
   return (
