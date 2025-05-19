@@ -40,10 +40,23 @@ export async function getPrescriptions() {
   return data;
 }
 
-
+/**
+ * Fetch a prescription by its ID.
+ * @param {number} id 
+ * @returns {Promise<Object>} prescription object
+ */
 export async function getPrescriptionById(id) {
   const { data } = await axios.get(`/prescriptions/${id}`);
   return data;
 }
 
+/**
+ * Request a refill for a prescription.
+ * @param {number} prescriptionId 
+ * @returns {Promise<string>} confirmation message
+ */
+export async function requestRefill(prescriptionId) {
+  const { data } = await axios.post(`/prescriptions/${prescriptionId}/refill-request`);
+  return data;
+}
 

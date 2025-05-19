@@ -78,6 +78,8 @@ public class SecurityConfig {
                                 .requestMatchers("/owner/**").hasRole("OWNER")
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/doctor/**").hasRole("DOCTOR")
+                                .requestMatchers(HttpMethod.POST, "/prescriptions/*/refill-request").hasRole("PATIENT")
+
                                 .requestMatchers(HttpMethod.POST, "/prescriptions").hasRole("DOCTOR")
                                 .requestMatchers(HttpMethod.DELETE, "/prescriptions/**").hasAnyRole("DOCTOR","ADMIN","OWNER")
                                 .requestMatchers(HttpMethod.GET, "/prescriptions/**").hasAnyRole("DOCTOR","ADMIN","OWNER","PATIENT")

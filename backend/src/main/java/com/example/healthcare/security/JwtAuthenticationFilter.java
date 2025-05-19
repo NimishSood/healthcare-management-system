@@ -42,12 +42,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        System.out.println("AUTH FILTER: Raw JWT: " + token); // <<<<<<<<<<<<<< HERE
+        System.out.println("AUTH FILTER: Raw JWT: " + token);
 
         String email;
         try {
             email = jwtService.extractUsername(token);
-            System.out.println("AUTH FILTER: Extracted email from JWT: " + email); // <<<<<<<<<<<<<< HERE
+            System.out.println("AUTH FILTER: Extracted email from JWT: " + email);
         } catch (ExpiredJwtException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT expired");
             return;
@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 3) Load user, block if deleted or deactivated
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userRepository.findByEmailAndIsDeletedFalse(email).orElse(null);
-            System.out.println("AUTH FILTER: user found? " + (user != null ? user.getId() : "NOT FOUND")); // <<<<<<<<<<< HERE
+            System.out.println("AUTH FILTER: user found? " + (user != null ? user.getId() : "NOT FOUND"));
 
             if (user != null
                     && user.getAccountStatus() != AccountStatus.DEACTIVATED
@@ -68,6 +68,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(
                                 user, null, user.getAuthorities()
                         );
+
+                // **DEBUG PRINT: LOG THE AUTHORITIES**
+                System.out.println(">>> AUTHORITIES FOR " + user.getEmail() + ":");
+                if (user.getAuthorities() != null) {
+                    for (var ga : user.getAuthorities()) {
+                        System.out.println("    - " + ga.getAuthority());
+                    }
+                } else {
+                    System.out.println("    - (No authorities!)");
+                }
+
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
@@ -77,5 +88,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 
 }

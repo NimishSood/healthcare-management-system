@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -48,5 +49,19 @@ public class Prescription {
     @ManyToOne
     @JoinColumn(name = "cancelled_by", nullable = true)
     private User cancelledBy;           // User who cancelled (if isDeleted is true)
+
+    // Prescription.java (add inside class)
+    @Column(name = "refill_requested")
+    private boolean refillRequested = false;
+
+    @Column(name = "refill_status")
+    private String refillStatus=""; // "PENDING", "APPROVED", "DENIED"
+
+    // Optionally, add these for better UX/logs:
+    @Column(name = "refill_request_date")
+    private LocalDateTime refillRequestDate;
+
+    @Column(name = "refill_response_date")
+    private LocalDateTime refillResponseDate;
 }
 
