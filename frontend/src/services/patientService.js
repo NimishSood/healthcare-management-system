@@ -36,6 +36,14 @@ export async function cancelAppointment(appointmentId) {
  * @returns {Promise<Array>} list of prescription objects
  */
 export async function getPrescriptions() {
-  const { data } = await axios.get('/patient/prescriptions')
-  return data
+  const { data } = await axios.get('/prescriptions/mine');
+  return data;
 }
+
+
+export async function getPrescriptionById(id) {
+  const { data } = await axios.get(`/prescriptions/${id}`);
+  return data;
+}
+
+
