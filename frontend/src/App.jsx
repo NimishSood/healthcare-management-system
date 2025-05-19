@@ -14,9 +14,14 @@ import PatientLayout    from './features/patient-dashboard/layouts/PatientLayout
 import DashboardHome    from './features/patient-dashboard/pages/DashboardHome'
 import { AppointmentList } from './features/patient-dashboard/components/Appointments/AppointmentList'
 import PrescriptionsPage from './features/patient-dashboard/pages/PrescriptionsPage'
-import ProfilePage      from './features/patient-dashboard/pages/ProfilePage'
+import PatientProfilePage      from './features/patient-dashboard/pages/ProfilePage'
 
 import DoctorLayout     from './features/doctor-dashboard/layouts/DoctorLayout'
+import DoctorDashboardHome from './features/doctor-dashboard/pages/DashboardHome'
+import DoctorAppointmentsPage from './features/doctor-dashboard/pages/AppointmentsPage'
+import DoctorPrescriptionsPage from './features/doctor-dashboard/pages/PrescriptionsPage'
+import DoctorProfilePage from './features/doctor-dashboard/pages/ProfilePage'
+
 import AdminLayout      from './features/admin-dashboard/layouts/AdminLayout'
 import OwnerLayout      from './features/owner-dashboard/layouts/OwnerLayout'
 
@@ -25,6 +30,8 @@ import BookAppointmentPage from './features/patient-dashboard/pages/BookAppointm
 import TestPasswordPage from './features/patient-dashboard/pages/TestPasswordPage'
 import { ThemeProvider } from './context/ThemeContext'
 import PrescriptionDetailPage from './features/patient-dashboard/pages/PrescriptionDetailPage'
+
+
 
 export default function App() {
   return (
@@ -55,8 +62,8 @@ export default function App() {
             <Route path="appointments"  element={<AppointmentList />} />
             <Route path="appointments/book"  element={<BookAppointmentPage />} />
             <Route path="prescriptions" element={<PrescriptionsPage />} />
-            <Route path="profile"       element={<ProfilePage />} />
-            <Route path="messages" element={<MessagePage />} />
+            <Route path="profile"       element={<PatientProfilePage />} />
+            <Route path="messages" element={<MessagePage role="patient" />} />
             
 
 
@@ -71,7 +78,16 @@ export default function App() {
                 <DoctorLayout />
               </PrivateRoute>
             }
-          />
+          >
+            <Route index            element={<DoctorDashboardHome />} />
+            <Route path="appointments"  element={<DoctorAppointmentsPage />} />
+            <Route path="prescriptions" element={<DoctorPrescriptionsPage />} />
+            <Route path="profile"       element={<DoctorProfilePage />} />
+            <Route path="messages"      element={<MessagePage role="doctor" />} />
+
+            {/* You can replace the above <div> with actual imported components when ready */}
+          </Route>
+
 
           {/* protected: admin */}
           <Route

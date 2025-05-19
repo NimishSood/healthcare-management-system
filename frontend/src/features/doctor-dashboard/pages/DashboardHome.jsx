@@ -1,0 +1,1 @@
+export default function DoctorDashboardHome() { return <div>Doctor Home</div>; }
