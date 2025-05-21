@@ -12,6 +12,7 @@ export default function DoctorLayout() {
   const navItems = [
     { name: 'Home', path: '/doctor', icon: HomeIcon },
     { name: 'Appointments', path: '/doctor/appointments', icon: CalendarDaysIcon },
+    { name: 'Schedule', path: '/doctor/schedule', icon:CalendarDaysIcon },
     { name: 'Prescriptions', path: '/doctor/prescriptions', icon: ClipboardDocumentIcon },
     { name: 'Profile', path: '/doctor/profile', icon: UserCircleIcon },
     { name: 'Messages', path: '/doctor/messages', icon: ChatBubbleLeftRightIcon },

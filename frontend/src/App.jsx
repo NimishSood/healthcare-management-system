@@ -21,6 +21,7 @@ import DoctorDashboardHome from './features/doctor-dashboard/pages/DashboardHome
 import DoctorAppointmentsPage from './features/doctor-dashboard/pages/AppointmentsPage'
 import DoctorPrescriptionsPage from './features/doctor-dashboard/pages/PrescriptionsPage'
 import DoctorProfilePage from './features/doctor-dashboard/pages/ProfilePage'
+import DoctorSchedulePage from './features/doctor-dashboard/pages/DoctorSchedulePage'
 
 import AdminLayout      from './features/admin-dashboard/layouts/AdminLayout'
 import OwnerLayout      from './features/owner-dashboard/layouts/OwnerLayout'
@@ -84,6 +85,8 @@ export default function App() {
             <Route path="prescriptions" element={<DoctorPrescriptionsPage />} />
             <Route path="profile"       element={<DoctorProfilePage />} />
             <Route path="messages"      element={<MessagePage role="doctor" />} />
+            <Route path="schedule" element={<DoctorSchedulePage />} />
+
 
             {/* You can replace the above <div> with actual imported components when ready */}
           </Route>
