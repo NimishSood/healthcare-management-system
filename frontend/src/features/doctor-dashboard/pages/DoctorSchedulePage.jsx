@@ -3,25 +3,37 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import DoctorScheduleCalendar from "../components/Schedule/DoctorScheduleCalendar";
 import BreaksSection from "../components/Schedule/BreaksSection";
-import RecurringSlotsSection from "../components/Schedule/RecurringSlotsSection"; // <-- Now imported
+import RecurringSlotsSection from "../components/Schedule/RecurringSlotsSection";
 
 // Used for mapping days between frontend and backend
 const WEEK_DAYS = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+
+// Format date to YYYY-MM-DD in **LOCAL TIME** (not UTC!)
+function toLocalYMD(date) {
+  // Gets local year, month (0-based), day; pads as needed
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0')
+  ].join('-');
+}
 
 // Returns array of Dates (week starts Sunday)
 function getCurrentWeekDates(currentDate) {
   // Always start from Sunday (JavaScript default)
   const startOfWeek = new Date(currentDate);
+  startOfWeek.setHours(0,0,0,0);
   startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
   const weekDates = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date(startOfWeek);
     d.setDate(startOfWeek.getDate() + i);
+    d.setHours(0,0,0,0);
     return d;
   });
   // Debug printout for sanity
   console.log("=== Week Dates Mapping ===");
   weekDates.forEach((date, idx) => {
-    console.log(`weekDates[${idx}]: ${date.toISOString().slice(0,10)} (${WEEK_DAYS[idx]})`);
+    console.log(`weekDates[${idx}]: ${toLocalYMD(date)} (${WEEK_DAYS[idx]})`);
   });
   return weekDates;
 }
@@ -36,12 +48,12 @@ function mapDoctorScheduleToEvents(schedule, currentWeekStartDate) {
     if (dayIdx !== -1) {
       const day = weekDates[dayIdx];
       if (day) {
-        console.log(`[SLOT] id:${slot.id}, dayOfWeek:${slot.dayOfWeek}, dayIdx:${dayIdx}, date:${day.toISOString().slice(0,10)}`);
+        console.log(`[SLOT] id:${slot.id}, dayOfWeek:${slot.dayOfWeek}, dayIdx:${dayIdx}, date:${toLocalYMD(day)}`);
         events.push({
           id: `recurring-${slot.id}-${day.toDateString()}`,
           title: 'Working Slot',
-          start: `${day.toISOString().slice(0, 10)}T${slot.startTime}`,
-          end:   `${day.toISOString().slice(0, 10)}T${slot.endTime}`,
+          start: `${toLocalYMD(day)}T${slot.startTime}`,
+          end:   `${toLocalYMD(day)}T${slot.endTime}`,
           backgroundColor: '#34d399',
         });
       }
@@ -67,12 +79,12 @@ function mapDoctorScheduleToEvents(schedule, currentWeekStartDate) {
     if (dayIdx !== -1) {
       const day = weekDates[dayIdx];
       if (day) {
-        console.log(`[BREAK] id:${brk.id}, dayOfWeek:${brk.dayOfWeek}, dayIdx:${dayIdx}, date:${day.toISOString().slice(0,10)}`);
+        console.log(`[BREAK] id:${brk.id}, dayOfWeek:${brk.dayOfWeek}, dayIdx:${dayIdx}, date:${toLocalYMD(day)}`);
         events.push({
           id: `break-${brk.id}-${day.toDateString()}`,
           title: 'Break',
-          start: `${day.toISOString().slice(0, 10)}T${brk.startTime}`,
-          end:   `${day.toISOString().slice(0, 10)}T${brk.endTime}`,
+          start: `${toLocalYMD(day)}T${brk.startTime}`,
+          end:   `${toLocalYMD(day)}T${brk.endTime}`,
           backgroundColor: '#ef4444',
         });
       }
@@ -124,20 +136,26 @@ export default function DoctorSchedulePage() {
         <h1 className="text-2xl font-bold">My Schedule (Beta)</h1>
       </div>
 
-      {/* Recurring Working Slots */}
-      <RecurringSlotsSection
-        slots={schedule.recurringSlots || []}
-        refresh={refreshSchedule}
-      />
+      {/* Recurring Working Slots (card layout) */}
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
+        <RecurringSlotsSection
+          slots={schedule.recurringSlots || []}
+          refresh={refreshSchedule}
+        />
+      </div>
 
-      {/* Breaks Section */}
-      <BreaksSection
-        breaks={schedule.recurringBreaks || []}
-        refresh={refreshSchedule}
-      />
+      {/* Breaks Section (card layout) */}
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
+        <BreaksSection
+          breaks={schedule.recurringBreaks || []}
+          refresh={refreshSchedule}
+        />
+      </div>
 
-      {/* Calendar */}
-      <DoctorScheduleCalendar events={events} />
+      {/* Calendar (card layout) */}
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
+        <DoctorScheduleCalendar events={events} />
+      </div>
     </div>
   );
 }
