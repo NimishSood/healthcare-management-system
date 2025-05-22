@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { isOneTimeSlotPast } from "../../../../utils/dateUtils.js";
 
 export default function OneTimeSlotsSection({ slots, refresh }) {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -10,13 +11,11 @@ export default function OneTimeSlotsSection({ slots, refresh }) {
   const [editForm, setEditForm] = useState({ id: null, date: "", startTime: "", endTime: "", available: true });
   const [loading, setLoading] = useState(false);
 
-  // Autofocus for Add modal
   const dateRef = useRef();
   useEffect(() => {
     if (showAddModal && dateRef.current) dateRef.current.focus();
   }, [showAddModal]);
 
-  // Autofocus for Edit modal
   const editDateRef = useRef();
   useEffect(() => {
     if (showEditModal && editDateRef.current) editDateRef.current.focus();
@@ -34,21 +33,25 @@ export default function OneTimeSlotsSection({ slots, refresh }) {
 
   // Add slot
   const handleAdd = async (e) => {
-    e.preventDefault();
-    if (!form.date || !form.startTime || !form.endTime) return toast.error("Fill all fields!");
-    setLoading(true);
-    try {
-      await axios.post("/doctor/schedule/onetime", form);
-      toast.success("One-time slot added!");
-      setForm({ date: "", startTime: "", endTime: "", available: true });
-      setShowAddModal(false);
-      refresh();
-    } catch {
-      toast.error("Failed to add slot");
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  if (!form.date || !form.startTime || !form.endTime)
+    return toast.error("Fill all fields!");
+  // Check for adding slot in the past
+  if (isOneTimeSlotPast({ date: form.date, endTime: form.endTime }))
+    return toast.error("Cannot add a one-time slot in the past!");
+  setLoading(true);
+  try {
+    await axios.post("/doctor/schedule/onetime", form);
+    toast.success("One-time slot added!");
+    setForm({ date: "", startTime: "", endTime: "", available: true });
+    setShowAddModal(false);
+    refresh();
+  } catch {
+    toast.error("Failed to add slot");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Open Edit modal
   const openEdit = (slot) => {
@@ -87,7 +90,6 @@ export default function OneTimeSlotsSection({ slots, refresh }) {
 
   return (
     <div className="mb-8">
-      {/* Header and Add Button */}
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-semibold">One-Time Slots</h2>
         <button
@@ -251,28 +253,41 @@ export default function OneTimeSlotsSection({ slots, refresh }) {
             </tr>
           </thead>
           <tbody>
-            {slots.map(slot => (
-              <tr key={slot.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition">
-                <td className="px-3 py-2">{slot.date}</td>
-                <td className="px-3 py-2">{slot.startTime}</td>
-                <td className="px-3 py-2">{slot.endTime}</td>
-                <td className="px-3 py-2">{slot.available ? "Yes" : "No"}</td>
-                <td className="px-3 py-2 flex gap-2">
-                  <button
-                    className="text-blue-600 hover:underline font-medium cursor-pointer"
-                    onClick={() => openEdit(slot)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="text-red-500 hover:underline font-medium cursor-pointer"
-                    onClick={() => handleDelete(slot.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {slots.map(slot => {
+              const isPast = isOneTimeSlotPast(slot);
+              return (
+                <tr key={slot.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition">
+                  <td className="px-3 py-2">{slot.date}</td>
+                  <td className="px-3 py-2">{slot.startTime}</td>
+                  <td className="px-3 py-2">{slot.endTime}</td>
+                  <td className="px-3 py-2">{slot.available ? "Yes" : "No"}</td>
+                  <td className="px-3 py-2 flex gap-2">
+                    <button
+                      className={`text-blue-600 hover:underline font-medium cursor-pointer ${isPast ? "opacity-40 cursor-not-allowed" : ""}`}
+                      onClick={() => {
+                        if (isPast) toast("Cannot edit past slots.", { icon: "⚠️" });
+                        else openEdit(slot);
+                      }}
+                      disabled={isPast}
+                      title={isPast ? "Cannot edit past slots" : "Edit"}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className={`text-red-500 hover:underline font-medium cursor-pointer ${isPast ? "opacity-40 cursor-not-allowed" : ""}`}
+                      onClick={() => {
+                        if (isPast) toast("Cannot delete past slots.", { icon: "⚠️" });
+                        else handleDelete(slot.id);
+                      }}
+                      disabled={isPast}
+                      title={isPast ? "Cannot delete past slots" : "Delete"}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

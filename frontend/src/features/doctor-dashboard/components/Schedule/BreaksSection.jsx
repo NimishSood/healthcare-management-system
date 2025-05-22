@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { isRecurringPast } from "../../../../utils/dateUtils.js";
 
 export default function BreaksSection({ breaks, refresh }) {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -11,12 +12,10 @@ export default function BreaksSection({ breaks, refresh }) {
 
   const dayRef = useRef();
 
-  // Autofocus first field when modal opens
   useEffect(() => {
     if (showAddModal && dayRef.current) dayRef.current.focus();
   }, [showAddModal]);
 
-  // Autofocus for edit modal
   const editDayRef = useRef();
   useEffect(() => {
     if (showEditModal && editDayRef.current) editDayRef.current.focus();
@@ -27,22 +26,26 @@ export default function BreaksSection({ breaks, refresh }) {
 
   // Add Break
   const handleAdd = async (e) => {
-    e.preventDefault();
-    if (!form.dayOfWeek || !form.startTime || !form.endTime)
-      return toast.error("Fill all fields!");
-    setLoading(true);
-    try {
-      await axios.post("/doctor/schedule/break", form);
-      toast.success("Break added!");
-      setForm({ dayOfWeek: "", startTime: "", endTime: "" });
-      setShowAddModal(false);
-      refresh();
-    } catch {
-      toast.error("Failed to add break");
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  if (!form.dayOfWeek || !form.startTime || !form.endTime)
+    return toast.error("Fill all fields!");
+  // Disallow adding breaks in the past
+  if (isRecurringPast({ dayOfWeek: form.dayOfWeek, endTime: form.endTime }))
+    return toast.error("Cannot add a break in the past!");
+  setLoading(true);
+  try {
+    await axios.post("/doctor/schedule/break", form);
+    toast.success("Break added!");
+    setForm({ dayOfWeek: "", startTime: "", endTime: "" });
+    setShowAddModal(false);
+    refresh();
+  } catch {
+    toast.error("Failed to add break");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Edit Break (open modal)
   const openEdit = (brk) => {
@@ -233,30 +236,40 @@ export default function BreaksSection({ breaks, refresh }) {
             </tr>
           </thead>
           <tbody>
-            {breaks.map(brk => (
-              <tr
-                key={brk.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-900 transition"
-              >
-                <td className="px-3 py-2">{brk.dayOfWeek}</td>
-                <td className="px-3 py-2">{brk.startTime}</td>
-                <td className="px-3 py-2">{brk.endTime}</td>
-                <td className="px-3 py-2 flex gap-2">
-                  <button
-                    className="text-blue-600 hover:underline font-medium cursor-pointer"
-                    onClick={() => openEdit(brk)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="text-red-500 hover:underline font-medium cursor-pointer"
-                    onClick={() => handleDelete(brk.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {breaks.map(brk => {
+              const isPast = isRecurringPast(brk);
+              return (
+                <tr key={brk.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition">
+                  <td className="px-3 py-2">{brk.dayOfWeek}</td>
+                  <td className="px-3 py-2">{brk.startTime}</td>
+                  <td className="px-3 py-2">{brk.endTime}</td>
+                  <td className="px-3 py-2 flex gap-2">
+                    <button
+                      className={`text-blue-600 hover:underline font-medium cursor-pointer ${isPast ? "opacity-40 cursor-not-allowed" : ""}`}
+                      onClick={() => {
+                        if (isPast) toast("Cannot edit past breaks.", { icon: "⚠️" });
+                        else openEdit(brk);
+                      }}
+                      disabled={isPast}
+                      title={isPast ? "Cannot edit past breaks" : "Edit"}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className={`text-red-500 hover:underline font-medium cursor-pointer ${isPast ? "opacity-40 cursor-not-allowed" : ""}`}
+                      onClick={() => {
+                        if (isPast) toast("Cannot delete past breaks.", { icon: "⚠️" });
+                        else handleDelete(brk.id);
+                      }}
+                      disabled={isPast}
+                      title={isPast ? "Cannot delete past breaks" : "Delete"}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

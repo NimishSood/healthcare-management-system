@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-
+import { isRecurringPast } from "../../../../utils/dateUtils.js";
 export default function RecurringSlotsSection({ slots, refresh }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -27,22 +27,25 @@ export default function RecurringSlotsSection({ slots, refresh }) {
 
   // Add slot
   const handleAdd = async (e) => {
-    e.preventDefault();
-    if (!form.dayOfWeek || !form.startTime || !form.endTime)
-      return toast.error("Fill all fields!");
-    setLoading(true);
-    try {
-      await axios.post("/doctor/schedule/recurring", form);
-      toast.success("Recurring slot added!");
-      setForm({ dayOfWeek: "", startTime: "", endTime: "" });
-      setShowAddModal(false);
-      refresh();
-    } catch {
-      toast.error("Failed to add slot");
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  if (!form.dayOfWeek || !form.startTime || !form.endTime)
+    return toast.error("Fill all fields!");
+  // Check for adding recurring slot in the past
+  if (isRecurringPast({ dayOfWeek: form.dayOfWeek, endTime: form.endTime }))
+    return toast.error("Cannot add a recurring slot in the past!");
+  setLoading(true);
+  try {
+    await axios.post("/doctor/schedule/recurring", form);
+    toast.success("Recurring slot added!");
+    setForm({ dayOfWeek: "", startTime: "", endTime: "" });
+    setShowAddModal(false);
+    refresh();
+  } catch {
+    toast.error("Failed to add slot");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Open Edit modal
   const openEdit = (slot) => {
@@ -221,41 +224,54 @@ export default function RecurringSlotsSection({ slots, refresh }) {
       )}
 
       {/* Table Container */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-4">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-100 dark:bg-gray-800">
-              <th className="text-left px-3 py-2">Day</th>
-              <th className="text-left px-3 py-2">Start</th>
-              <th className="text-left px-3 py-2">End</th>
-              <th className="text-left px-3 py-2"></th>
+  <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-4">
+    <table className="w-full">
+      <thead>
+        <tr className="bg-gray-100 dark:bg-gray-800">
+          <th className="text-left px-3 py-2">Day</th>
+          <th className="text-left px-3 py-2">Start</th>
+          <th className="text-left px-3 py-2">End</th>
+          <th className="text-left px-3 py-2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {slots.map(slot => {
+          const isPast = isRecurringPast(slot);
+          return (
+            <tr key={slot.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition">
+              <td className="px-3 py-2">{slot.dayOfWeek}</td>
+              <td className="px-3 py-2">{slot.startTime}</td>
+              <td className="px-3 py-2">{slot.endTime}</td>
+              <td className="px-3 py-2 flex gap-2">
+                <button
+                  className={`text-blue-600 hover:underline font-medium cursor-pointer ${isPast ? "opacity-40 cursor-not-allowed" : ""}`}
+                  onClick={() => {
+                    if (isPast) toast("Cannot edit past slots.", { icon: "⚠️" });
+                    else openEdit(slot);
+                  }}
+                  disabled={isPast}
+                  title={isPast ? "Cannot edit past slots" : "Edit"}
+                >
+                  Edit
+                </button>
+                <button
+                  className={`text-red-500 hover:underline font-medium cursor-pointer ${isPast ? "opacity-40 cursor-not-allowed" : ""}`}
+                  onClick={() => {
+                    if (isPast) toast("Cannot delete past slots.", { icon: "⚠️" });
+                    else handleDelete(slot.id);
+                  }}
+                  disabled={isPast}
+                  title={isPast ? "Cannot delete past slots" : "Delete"}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {slots.map(slot => (
-              <tr key={slot.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition">
-                <td className="px-3 py-2">{slot.dayOfWeek}</td>
-                <td className="px-3 py-2">{slot.startTime}</td>
-                <td className="px-3 py-2">{slot.endTime}</td>
-                <td className="px-3 py-2 flex gap-2">
-                  <button
-                    className="text-blue-600 hover:underline font-medium cursor-pointer"
-                    onClick={() => openEdit(slot)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="text-red-500 hover:underline font-medium cursor-pointer"
-                    onClick={() => handleDelete(slot.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
     </div>
   );
 }
