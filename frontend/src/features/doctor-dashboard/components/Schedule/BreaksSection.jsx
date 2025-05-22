@@ -221,43 +221,45 @@ export default function BreaksSection({ breaks, refresh }) {
         </div>
       )}
 
-      {/* Breaks Table */}
-      <table className="w-full mb-4 border rounded shadow-sm">
-        <thead>
-          <tr className="bg-gray-100 dark:bg-gray-800">
-            <th className="text-left px-3 py-2">Day</th>
-            <th className="text-left px-3 py-2">Start</th>
-            <th className="text-left px-3 py-2">End</th>
-            <th className="text-left px-3 py-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {breaks.map(brk => (
-            <tr
-              key={brk.id}
-              className="hover:bg-gray-50 dark:hover:bg-gray-900 transition"
-            >
-              <td className="px-3 py-2">{brk.dayOfWeek}</td>
-              <td className="px-3 py-2">{brk.startTime}</td>
-              <td className="px-3 py-2">{brk.endTime}</td>
-              <td className="px-3 py-2 flex gap-2">
-                <button
-                  className="text-blue-600 hover:underline font-medium cursor-pointer"
-                  onClick={() => openEdit(brk)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="text-red-500 hover:underline font-medium cursor-pointer"
-                  onClick={() => handleDelete(brk.id)}
-                >
-                  Delete
-                </button>
-              </td>
+      {/* Breaks Table - rounded card style */}
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-100 dark:bg-gray-800">
+              <th className="text-left px-3 py-2">Day</th>
+              <th className="text-left px-3 py-2">Start</th>
+              <th className="text-left px-3 py-2">End</th>
+              <th className="text-left px-3 py-2"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {breaks.map(brk => (
+              <tr
+                key={brk.id}
+                className="hover:bg-gray-50 dark:hover:bg-gray-900 transition"
+              >
+                <td className="px-3 py-2">{brk.dayOfWeek}</td>
+                <td className="px-3 py-2">{brk.startTime}</td>
+                <td className="px-3 py-2">{brk.endTime}</td>
+                <td className="px-3 py-2 flex gap-2">
+                  <button
+                    className="text-blue-600 hover:underline font-medium cursor-pointer"
+                    onClick={() => openEdit(brk)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="text-red-500 hover:underline font-medium cursor-pointer"
+                    onClick={() => handleDelete(brk.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
