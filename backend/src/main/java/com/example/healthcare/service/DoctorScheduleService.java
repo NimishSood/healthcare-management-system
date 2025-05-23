@@ -42,32 +42,49 @@ public class DoctorScheduleService {
         // Check recurring slots
         for (DoctorRecurringSchedule slot : recurringRepo.findByDoctorId(doctorId)) {
             if (!slot.getDayOfWeek().equals(day)) continue;
-            if (excludeId != null && slot.getId().equals(excludeId) && type.equals("RECURRING")) continue;
+            if (excludeId != null && slot.getId().equals(excludeId) && "RECURRING".equals(type)) continue;
             if (ScheduleValidationUtils.isTimeOverlap(start, end, slot.getStartTime(), slot.getEndTime())) return false;
         }
         // Check recurring breaks
         for (DoctorRecurringBreak brk : breakRepo.findByDoctorId(doctorId)) {
             if (!brk.getDayOfWeek().equals(day)) continue;
-            if (excludeId != null && brk.getId().equals(excludeId) && type.equals("BREAK")) continue;
+            if (excludeId != null && brk.getId().equals(excludeId) && "BREAK".equals(type)) continue;
             if (ScheduleValidationUtils.isTimeOverlap(start, end, brk.getStartTime(), brk.getEndTime())) return false;
+        }
+        // Check one-time slots ON THAT DAY
+        for (DoctorOneTimeSlot slot : oneTimeRepo.findByDoctorId(doctorId)) {
+            if (!slot.getDate().getDayOfWeek().equals(day)) continue;
+            if (excludeId != null && slot.getId().equals(excludeId) && "ONE_TIME".equals(type)) continue;
+            if (ScheduleValidationUtils.isTimeOverlap(start, end, slot.getStartTime(), slot.getEndTime())) return false;
         }
         return true;
     }
+
     /**
      * For one-time slot: Also checks recurring slots/breaks for that day of week.
      */
     public boolean isAvailableOneTime(Long doctorId, LocalDate date, LocalTime start, LocalTime end, Long excludeId) {
-        // 1. One-time slots for that date
+        // 1. Check one-time slots for that date
         for (DoctorOneTimeSlot slot : oneTimeRepo.findByDoctorId(doctorId)) {
             if (!slot.getDate().equals(date)) continue;
             if (excludeId != null && slot.getId().equals(excludeId)) continue;
             if (ScheduleValidationUtils.isTimeOverlap(start, end, slot.getStartTime(), slot.getEndTime())) return false;
         }
-        // 2. Recurring slots/breaks for that day of week
+        // 2. Check recurring slots/breaks for that day of week
         DayOfWeek day = date.getDayOfWeek();
-        if (!isAvailable(doctorId, day, start, end, null, "")) return false;
+        // Recurring slots
+        for (DoctorRecurringSchedule slot : recurringRepo.findByDoctorId(doctorId)) {
+            if (!slot.getDayOfWeek().equals(day)) continue;
+            if (ScheduleValidationUtils.isTimeOverlap(start, end, slot.getStartTime(), slot.getEndTime())) return false;
+        }
+        // Recurring breaks
+        for (DoctorRecurringBreak brk : breakRepo.findByDoctorId(doctorId)) {
+            if (!brk.getDayOfWeek().equals(day)) continue;
+            if (ScheduleValidationUtils.isTimeOverlap(start, end, brk.getStartTime(), brk.getEndTime())) return false;
+        }
         return true;
     }
+
 
     // --- Recurring Schedule CRUD ---
 
