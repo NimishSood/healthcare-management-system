@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { isRecurringPast } from "../../../../utils/dateUtils.js";
+import { getMySlotRemovalRequests, submitSlotRemovalRequest } from "../../../../services/slotRemovalApi";
 
 export default function BreaksSection({ breaks, refresh }) {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -10,8 +11,14 @@ export default function BreaksSection({ breaks, refresh }) {
   const [editForm, setEditForm] = useState({ id: null, dayOfWeek: "", startTime: "", endTime: "" });
   const [loading, setLoading] = useState(false);
 
-  const dayRef = useRef();
+  // Slot removal requests
+  const [removalRequests, setRemovalRequests] = useState([]);
+  const [showRemovalModal, setShowRemovalModal] = useState(false);
+  const [removalSlot, setRemovalSlot] = useState(null);
+  const [removalReason, setRemovalReason] = useState("");
+  const [removalLoading, setRemovalLoading] = useState(false);
 
+  const dayRef = useRef();
   useEffect(() => {
     if (showAddModal && dayRef.current) dayRef.current.focus();
   }, [showAddModal]);
@@ -21,31 +28,34 @@ export default function BreaksSection({ breaks, refresh }) {
     if (showEditModal && editDayRef.current) editDayRef.current.focus();
   }, [showEditModal]);
 
+  // Load removal requests
+  useEffect(() => {
+    getMySlotRemovalRequests().then(setRemovalRequests).catch(() => setRemovalRequests([]));
+  }, [refresh]);
+
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handleEditChange = (e) => setEditForm({ ...editForm, [e.target.name]: e.target.value });
 
   // Add Break
   const handleAdd = async (e) => {
-  e.preventDefault();
-  if (!form.dayOfWeek || !form.startTime || !form.endTime)
-    return toast.error("Fill all fields!");
-  // Disallow adding breaks in the past
-  if (isRecurringPast({ dayOfWeek: form.dayOfWeek, endTime: form.endTime }))
-    return toast.error("Cannot add a break in the past!");
-  setLoading(true);
-  try {
-    await axios.post("/doctor/schedule/break", form);
-    toast.success("Break added!");
-    setForm({ dayOfWeek: "", startTime: "", endTime: "" });
-    setShowAddModal(false);
-    refresh();
-  } catch {
-    toast.error("Failed to add break");
-  } finally {
-    setLoading(false);
-  }
-};
-
+    e.preventDefault();
+    if (!form.dayOfWeek || !form.startTime || !form.endTime)
+      return toast.error("Fill all fields!");
+    if (isRecurringPast({ dayOfWeek: form.dayOfWeek, endTime: form.endTime }))
+      return toast.error("Cannot add a break in the past!");
+    setLoading(true);
+    try {
+      await axios.post("/doctor/schedule/break", form);
+      toast.success("Break added!");
+      setForm({ dayOfWeek: "", startTime: "", endTime: "" });
+      setShowAddModal(false);
+      refresh();
+    } catch {
+      toast.error("Failed to add break");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Edit Break (open modal)
   const openEdit = (brk) => {
@@ -80,6 +90,35 @@ export default function BreaksSection({ breaks, refresh }) {
       refresh();
     } catch {
       toast.error("Failed to delete");
+    }
+  };
+
+  // Request removal logic
+  const openRemovalModal = (slot) => {
+    setRemovalSlot(slot);
+    setRemovalReason("");
+    setShowRemovalModal(true);
+  };
+
+  const handleSubmitRemoval = async (e) => {
+    e.preventDefault();
+    setRemovalLoading(true);
+    try {
+      await submitSlotRemovalRequest({
+        slotType: "BREAK",
+        slotId: removalSlot.id,
+        reason: removalReason,
+      });
+      toast.success("Removal request sent!");
+      setShowRemovalModal(false);
+      setRemovalSlot(null);
+      setRemovalReason("");
+      // Refresh requests after submission
+      getMySlotRemovalRequests().then(setRemovalRequests).catch(() => {});
+    } catch {
+      toast.error("Failed to send removal request");
+    } finally {
+      setRemovalLoading(false);
     }
   };
 
@@ -224,6 +263,44 @@ export default function BreaksSection({ breaks, refresh }) {
         </div>
       )}
 
+      {/* Slot Removal Request Modal */}
+      {showRemovalModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <form
+            className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-2xl w-96 flex flex-col gap-4"
+            onSubmit={handleSubmitRemoval}
+          >
+            <h2 className="text-xl font-semibold mb-2">Request Break Removal</h2>
+            <p>Reason for removal:</p>
+            <textarea
+              className="border rounded w-full p-2 min-h-[60px] dark:bg-gray-800"
+              value={removalReason}
+              onChange={e => setRemovalReason(e.target.value)}
+              required
+              maxLength={1000}
+              placeholder="Describe why you want to remove this break."
+            />
+            <div className="flex gap-2 mt-2">
+              <button
+                type="submit"
+                className="bg-yellow-600 text-white px-4 py-2 rounded font-semibold hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-300 transition w-full"
+                disabled={removalLoading || !removalReason.trim()}
+              >
+                {removalLoading ? "Submitting..." : "Submit"}
+              </button>
+              <button
+                type="button"
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded font-semibold hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 transition w-full"
+                onClick={() => setShowRemovalModal(false)}
+                disabled={removalLoading}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* Breaks Table - rounded card style */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
         <table className="w-full">
@@ -238,6 +315,9 @@ export default function BreaksSection({ breaks, refresh }) {
           <tbody>
             {breaks.map(brk => {
               const isPast = isRecurringPast(brk);
+              const pendingRequest = removalRequests.find(
+                req => req.slotType === "BREAK" && req.slotId === brk.id && req.status === "PENDING"
+              );
               return (
                 <tr key={brk.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition">
                   <td className="px-3 py-2">{brk.dayOfWeek}</td>
@@ -265,6 +345,21 @@ export default function BreaksSection({ breaks, refresh }) {
                       title={isPast ? "Cannot delete past breaks" : "Delete"}
                     >
                       Delete
+                    </button>
+                    <button
+                      className={`text-yellow-600 hover:underline font-medium cursor-pointer ${pendingRequest ? "opacity-40 cursor-not-allowed" : ""}`}
+                      onClick={() => {
+                        if (pendingRequest) toast("Request already pending.");
+                        else openRemovalModal(brk);
+                      }}
+                      disabled={!!pendingRequest}
+                      title={
+                        pendingRequest
+                          ? "Removal request pending"
+                          : "Request Removal"
+                      }
+                    >
+                      {pendingRequest ? "Pending…" : "Request Remove"}
                     </button>
                   </td>
                 </tr>
