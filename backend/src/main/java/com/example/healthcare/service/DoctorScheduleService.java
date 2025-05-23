@@ -1,33 +1,34 @@
 package com.example.healthcare.service;
 
 import com.example.healthcare.dto.DoctorSchedule.*;
+import com.example.healthcare.dto.Profiles.DoctorProfileDto;
 import com.example.healthcare.entity.Doctor;
-import com.example.healthcare.entity.DoctorSchedule.DoctorRecurringSchedule;
-import com.example.healthcare.entity.DoctorSchedule.DoctorOneTimeSlot;
-import com.example.healthcare.entity.DoctorSchedule.DoctorRecurringBreak;
-import com.example.healthcare.repository.DoctorSchedule.DoctorRecurringScheduleRepository;
-import com.example.healthcare.repository.DoctorSchedule.DoctorOneTimeSlotRepository;
-import com.example.healthcare.repository.DoctorSchedule.DoctorRecurringBreakRepository;
+import com.example.healthcare.entity.DoctorSchedule.*;
+import com.example.healthcare.repository.DoctorSchedule.*;
 import com.example.healthcare.repository.DoctorRepository;
+import com.example.healthcare.service.AuditLogService; // Make sure you import this!
+import com.example.healthcare.util.ScheduleValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class DoctorScheduleService
-{
+public class DoctorScheduleService {
 
     private final DoctorRepository doctorRepository;
     private final DoctorRecurringScheduleRepository recurringRepo;
     private final DoctorOneTimeSlotRepository oneTimeRepo;
     private final DoctorRecurringBreakRepository breakRepo;
+    private final SlotRemovalRequestRepository slotRemovalRequestRepository;
+    private final AuditLogService auditLogService; // Injected for logging
 
     // --- Recurring Schedule CRUD ---
 
@@ -37,6 +38,9 @@ public class DoctorScheduleService
 
     @Transactional
     public DoctorRecurringSchedule addRecurringSlot(Long doctorId, DayOfWeek day, LocalTime start, LocalTime end) {
+        if (ScheduleValidationUtils.isRecurringPast(day, end)) {
+            throw new IllegalArgumentException("Cannot add a recurring slot in the past.");
+        }
         Doctor doctor = doctorRepository.findById(doctorId).orElseThrow();
         DoctorRecurringSchedule slot = new DoctorRecurringSchedule();
         slot.setDoctor(doctor);
@@ -44,24 +48,63 @@ public class DoctorScheduleService
         slot.setStartTime(start);
         slot.setEndTime(end);
         // TODO: Check for overlaps with other recurring slots or breaks
-        return recurringRepo.save(slot);
+
+        DoctorRecurringSchedule saved = recurringRepo.save(slot);
+
+        // --- Audit log for slot creation ---
+        auditLogService.logAction(
+                "Recurring Slot Added",
+                doctor.getEmail(),
+                doctor.getRole().name(),
+                String.format("Added recurring slot: %s %s-%s", day, start, end),
+                null,
+                saved.toString()
+        );
+        return saved;
     }
 
     @Transactional
     public DoctorRecurringSchedule updateRecurringSlot(Long doctorId, Long slotId, DayOfWeek day, LocalTime start, LocalTime end) {
+        if (ScheduleValidationUtils.isRecurringPast(day, end)) {
+            throw new IllegalArgumentException("Cannot update a recurring slot in the past.");
+        }
         DoctorRecurringSchedule slot = recurringRepo.findById(slotId).orElseThrow();
-        // Only allow update if slot belongs to doctor
         if (!Objects.equals(slot.getDoctor().getId(), doctorId)) throw new RuntimeException("Unauthorized");
         slot.setDayOfWeek(day);
         slot.setStartTime(start);
         slot.setEndTime(end);
-        // TODO: Check for overlaps
-        return recurringRepo.save(slot);
+
+        DoctorRecurringSchedule saved = recurringRepo.save(slot);
+
+        // --- Audit log for slot update ---
+        auditLogService.logAction(
+                "Recurring Slot Updated",
+                slot.getDoctor().getEmail(),
+                slot.getDoctor().getRole().name(),
+                String.format("Updated recurring slot ID %d to: %s %s-%s", slotId, day, start, end),
+                null,
+                saved.toString()
+        );
+        return saved;
     }
 
     @Transactional
     public void deleteRecurringSlot(Long slotId) {
+        DoctorRecurringSchedule slot = recurringRepo.findById(slotId).orElseThrow();
+        if (ScheduleValidationUtils.isRecurringPast(slot.getDayOfWeek(), slot.getEndTime())) {
+            throw new IllegalArgumentException("Cannot delete a recurring slot in the past.");
+        }
         recurringRepo.deleteById(slotId);
+
+        // --- Audit log for slot deletion ---
+        auditLogService.logAction(
+                "Recurring Slot Deleted",
+                slot.getDoctor().getEmail(),
+                slot.getDoctor().getRole().name(),
+                String.format("Deleted recurring slot ID %d", slotId),
+                null,
+                slot.toString()
+        );
     }
 
     // --- One-time Slot CRUD ---
@@ -72,6 +115,9 @@ public class DoctorScheduleService
 
     @Transactional
     public DoctorOneTimeSlot addOneTimeSlot(Long doctorId, LocalDate date, LocalTime start, LocalTime end, boolean available) {
+        if (ScheduleValidationUtils.isOneTimeSlotPast(date, end)) {
+            throw new IllegalArgumentException("Cannot add a one-time slot in the past.");
+        }
         Doctor doctor = doctorRepository.findById(doctorId).orElseThrow();
         DoctorOneTimeSlot slot = new DoctorOneTimeSlot();
         slot.setDoctor(doctor);
@@ -79,25 +125,64 @@ public class DoctorScheduleService
         slot.setStartTime(start);
         slot.setEndTime(end);
         slot.setAvailable(available);
-        // TODO: Check for overlaps with recurring slots or breaks
-        return oneTimeRepo.save(slot);
+
+        DoctorOneTimeSlot saved = oneTimeRepo.save(slot);
+
+        // --- Audit log for one-time slot creation ---
+        auditLogService.logAction(
+                "One-Time Slot Added",
+                doctor.getEmail(),
+                doctor.getRole().name(),
+                String.format("Added one-time slot: %s %s-%s", date, start, end),
+                null,
+                saved.toString()
+        );
+        return saved;
     }
 
     @Transactional
     public DoctorOneTimeSlot updateOneTimeSlot(Long doctorId, Long slotId, LocalDate date, LocalTime start, LocalTime end, boolean available) {
+        if (ScheduleValidationUtils.isOneTimeSlotPast(date, end)) {
+            throw new IllegalArgumentException("Cannot edit a one-time slot in the past.");
+        }
         DoctorOneTimeSlot slot = oneTimeRepo.findById(slotId).orElseThrow();
         if (!Objects.equals(slot.getDoctor().getId(), doctorId)) throw new RuntimeException("Unauthorized");
         slot.setDate(date);
         slot.setStartTime(start);
         slot.setEndTime(end);
         slot.setAvailable(available);
-        // TODO: Overlap checks
-        return oneTimeRepo.save(slot);
+
+        DoctorOneTimeSlot saved = oneTimeRepo.save(slot);
+
+        // --- Audit log for one-time slot update ---
+        auditLogService.logAction(
+                "One-Time Slot Updated",
+                slot.getDoctor().getEmail(),
+                slot.getDoctor().getRole().name(),
+                String.format("Updated one-time slot ID %d: %s %s-%s", slotId, date, start, end),
+                null,
+                saved.toString()
+        );
+        return saved;
     }
 
     @Transactional
     public void deleteOneTimeSlot(Long slotId) {
+        DoctorOneTimeSlot slot = oneTimeRepo.findById(slotId).orElseThrow();
+        if (ScheduleValidationUtils.isOneTimeSlotPast(slot.getDate(), slot.getEndTime())) {
+            throw new IllegalArgumentException("Cannot delete a one-time slot in the past.");
+        }
         oneTimeRepo.deleteById(slotId);
+
+        // --- Audit log for one-time slot deletion ---
+        auditLogService.logAction(
+                "One-Time Slot Deleted",
+                slot.getDoctor().getEmail(),
+                slot.getDoctor().getRole().name(),
+                String.format("Deleted one-time slot ID %d", slotId),
+                null,
+                slot.toString()
+        );
     }
 
     // --- Recurring Breaks CRUD ---
@@ -108,33 +193,76 @@ public class DoctorScheduleService
 
     @Transactional
     public DoctorRecurringBreak addRecurringBreak(Long doctorId, DayOfWeek day, LocalTime start, LocalTime end) {
+        if (ScheduleValidationUtils.isRecurringPast(day, end)) {
+            throw new IllegalArgumentException("Cannot add a recurring break in the past.");
+        }
         Doctor doctor = doctorRepository.findById(doctorId).orElseThrow();
         DoctorRecurringBreak brk = new DoctorRecurringBreak();
         brk.setDoctor(doctor);
         brk.setDayOfWeek(day);
         brk.setStartTime(start);
         brk.setEndTime(end);
-        // TODO: Check for overlap with working slots
-        return breakRepo.save(brk);
+
+        DoctorRecurringBreak saved = breakRepo.save(brk);
+
+        // --- Audit log for recurring break creation ---
+        auditLogService.logAction(
+                "Recurring Break Added",
+                doctor.getEmail(),
+                doctor.getRole().name(),
+                String.format("Added recurring break: %s %s-%s", day, start, end),
+                null,
+                saved.toString()
+        );
+        return saved;
     }
 
     @Transactional
     public DoctorRecurringBreak updateRecurringBreak(Long doctorId, Long breakId, DayOfWeek day, LocalTime start, LocalTime end) {
+        if (ScheduleValidationUtils.isRecurringPast(day, end)) {
+            throw new IllegalArgumentException("Cannot update a recurring break in the past.");
+        }
         DoctorRecurringBreak brk = breakRepo.findById(breakId).orElseThrow();
         if (!Objects.equals(brk.getDoctor().getId(), doctorId)) throw new RuntimeException("Unauthorized");
         brk.setDayOfWeek(day);
         brk.setStartTime(start);
         brk.setEndTime(end);
-        // TODO: Overlap checks
-        return breakRepo.save(brk);
+
+        DoctorRecurringBreak saved = breakRepo.save(brk);
+
+        // --- Audit log for recurring break update ---
+        auditLogService.logAction(
+                "Recurring Break Updated",
+                brk.getDoctor().getEmail(),
+                brk.getDoctor().getRole().name(),
+                String.format("Updated recurring break ID %d: %s %s-%s", breakId, day, start, end),
+                null,
+                saved.toString()
+        );
+        return saved;
     }
 
     @Transactional
     public void deleteRecurringBreak(Long breakId) {
-        breakRepo.deleteById(breakId);
+        DoctorRecurringBreak brk = breakRepo.findById(breakId).orElseThrow();
+        if (ScheduleValidationUtils.isRecurringPast(brk.getDayOfWeek(), brk.getEndTime())) {
+            throw new IllegalArgumentException("Cannot delete a recurring break in the past.");
+        }
+        breakRepo.deleteById(brk.getId());
+
+        // --- Audit log for recurring break deletion ---
+        auditLogService.logAction(
+                "Recurring Break Deleted",
+                brk.getDoctor().getEmail(),
+                brk.getDoctor().getRole().name(),
+                String.format("Deleted recurring break ID %d", breakId),
+                null,
+                brk.toString()
+        );
     }
 
     // --- Fetch Schedule for Range ---
+
     public DoctorFullScheduleDto getFullSchedule(Long doctorId) {
         return new DoctorFullScheduleDto(
                 getRecurringSchedule(doctorId),
@@ -168,10 +296,20 @@ public class DoctorScheduleService
         for (RecurringSlotDto dto : weekSchedule) {
             addRecurringSlot(doctorId, dto.getDayOfWeek(), dto.getStartTime(), dto.getEndTime());
         }
+
+        // --- Audit log for batch replace ---
+        auditLogService.logAction(
+                "Week Schedule Replaced",
+                doctorRepository.findById(doctorId).map(Doctor::getEmail).orElse("UNKNOWN"),
+                "DOCTOR",
+                "Replaced all recurring slots for the week.",
+                null,
+                weekSchedule.toString()
+        );
     }
 
     @Transactional
-    public DoctorFullScheduleDto importSchedule(Long doctorId, DoctorFullScheduleDto dto) {
+    public DoctorFullScheduleDto importTemplate(Long doctorId, DoctorFullScheduleDto dto) {
         Doctor doctor = doctorRepository.findById(doctorId).orElseThrow();
 
         // Remove all old slots/breaks (could also soft-delete for history)
@@ -206,74 +344,124 @@ public class DoctorScheduleService
             });
         }
 
-        // Return updated full schedule
+        // --- Audit log for template import ---
+        auditLogService.logAction(
+                "Schedule Template Imported",
+                doctor.getEmail(),
+                doctor.getRole().name(),
+                "Imported a schedule template.",
+                null,
+                dto.toString()
+        );
+
         return getFullSchedule(doctorId);
     }
 
-    // --- Check if slot is available (for booking) ---
-    public boolean isAvailable(Long doctorId, LocalDate date, LocalTime start, LocalTime end) {
-        // 1. Check one-time slots
-        List<DoctorOneTimeSlot> daySlots = oneTimeRepo.findByDoctorIdAndDate(doctorId, date);
-        for (DoctorOneTimeSlot slot : daySlots) {
-            if (slot.isAvailable() && overlaps(slot.getStartTime(), slot.getEndTime(), start, end)) {
-                return true;
-            }
-        }
-        // 2. Check recurring slots and breaks
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-        List<DoctorRecurringSchedule> recSlots = recurringRepo.findByDoctorIdAndDayOfWeek(doctorId, dayOfWeek);
-        List<DoctorRecurringBreak> recBreaks = breakRepo.findByDoctorIdAndDayOfWeek(doctorId, dayOfWeek);
+    // --- Slot Removal Request CRUD (with audit logging) ---
 
-        boolean inWorking = recSlots.stream().anyMatch(slot ->
-                overlaps(slot.getStartTime(), slot.getEndTime(), start, end)
-        );
-        boolean inBreak = recBreaks.stream().anyMatch(brk ->
-                overlaps(brk.getStartTime(), brk.getEndTime(), start, end)
-        );
-        return inWorking && !inBreak;
-    }
-
-    // Helper: check time overlap
-    private boolean overlaps(LocalTime aStart, LocalTime aEnd, LocalTime bStart, LocalTime bEnd) {
-        return !aEnd.isBefore(bStart) && !bEnd.isBefore(aStart);
-    }
-
+    /**
+     * Doctor submits a slot removal request for a slot they want deleted.
+     */
     @Transactional
-    public void importTemplate(Long doctorId, DoctorFullScheduleDto template) {
+    public SlotRemovalRequestDto createSlotRemovalRequest(Long doctorId, SlotRemovalRequestCreateDto dto) {
         Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Doctor not found"));
 
-        // Delete existing schedule for this doctor
-        recurringRepo.deleteByDoctorId(doctorId);
-        oneTimeRepo.deleteByDoctorId(doctorId);
-        breakRepo.deleteByDoctorId(doctorId);
-
-        // Import recurring slots
-        if (template.getRecurringSlots() != null) {
-            for (DoctorRecurringSchedule slot : template.getRecurringSlots()) {
-                slot.setDoctor(doctor);
-                slot.setId(null); // to force insert, not update
-                recurringRepo.save(slot);
-            }
+        // ==== BLOCK DUPLICATES ====
+        boolean exists = slotRemovalRequestRepository.existsByDoctor_IdAndSlotTypeAndSlotIdAndStatus(
+                doctorId,
+                dto.getSlotType(),
+                dto.getSlotId(),
+                "PENDING"
+        );
+        if (exists) {
+            throw new IllegalStateException("A pending removal request already exists for this slot.");
         }
+        // ==========================
 
-        // Import one-time slots
-        if (template.getOneTimeSlots() != null) {
-            for (DoctorOneTimeSlot slot : template.getOneTimeSlots()) {
-                slot.setDoctor(doctor);
-                slot.setId(null);
-                oneTimeRepo.save(slot);
-            }
-        }
+        SlotRemovalRequest req = new SlotRemovalRequest();
+        req.setSlotType(dto.getSlotType());
+        req.setSlotId(dto.getSlotId());
+        req.setDoctor(doctor);
+        req.setReason(dto.getReason());
+        req.setStatus("PENDING");
+        req.setRequestedAt(LocalDateTime.now());
 
-        // Import recurring breaks
-        if (template.getRecurringBreaks() != null) {
-            for (DoctorRecurringBreak brk : template.getRecurringBreaks()) {
-                brk.setDoctor(doctor);
-                brk.setId(null);
-                breakRepo.save(brk);
-            }
+        try {
+            slotRemovalRequestRepository.save(req);
+
+            // --- Audit log for slot removal request ---
+            auditLogService.logAction(
+                    "Slot Removal Requested",
+                    doctor.getEmail(),
+                    doctor.getRole().name(),
+                    String.format("Requested removal for %s slot (ID: %d)", dto.getSlotType(), dto.getSlotId()),
+                    null,
+                    req.toString()
+            );
+        } catch (Exception e) {
+            // --- Audit log for failed removal request ---
+            auditLogService.logAction(
+                    "Slot Removal Request Failed",
+                    doctor.getEmail(),
+                    doctor.getRole().name(),
+                    "Doctor attempted to request slot removal.",
+                    e.getMessage(),
+                    dto.toString()
+            );
+            throw e;
         }
+        return toDto(req);
     }
 
+
+    /**
+     * Get all removal requests for a doctor.
+     */
+    public List<SlotRemovalRequestDto> getRemovalRequestsForDoctor(Long doctorId) {
+        return slotRemovalRequestRepository.findByDoctor_Id(doctorId)
+                .stream().map(this::toDto).toList();
+    }
+
+    // Helper method to convert entity to DTO
+    private SlotRemovalRequestDto toDto(SlotRemovalRequest req) {
+        SlotRemovalRequestDto dto = new SlotRemovalRequestDto();
+        dto.setId(req.getId());
+        dto.setSlotType(req.getSlotType());
+        dto.setSlotId(req.getSlotId());
+
+        // Map Doctor entity to DoctorProfileDto
+        if (req.getDoctor() != null) {
+            Doctor doctor = req.getDoctor();
+            DoctorProfileDto doctorProfileDto = new DoctorProfileDto();
+            doctorProfileDto.setId(doctor.getId());
+            doctorProfileDto.setFirstName(doctor.getFirstName());
+            doctorProfileDto.setLastName(doctor.getLastName());
+            doctorProfileDto.setEmail(doctor.getEmail());
+            doctorProfileDto.setPhoneNumber(doctor.getPhoneNumber());
+            doctorProfileDto.setRole(String.valueOf(doctor.getRole()));
+            doctorProfileDto.setSpecialty(doctor.getSpecialty());
+            doctorProfileDto.setLicenseNumber(doctor.getLicenseNumber());
+            doctorProfileDto.setAccountStatus(String.valueOf(doctor.getAccountStatus()));
+            // ...set any other fields you want visible in the profile DTO
+
+            dto.setDoctor(doctorProfileDto);
+        }
+
+        dto.setReason(req.getReason());
+        dto.setStatus(req.getStatus());
+        dto.setRequestedAt(req.getRequestedAt());
+        dto.setReviewedAt(req.getReviewedAt());
+        dto.setReviewedByAdminId(req.getReviewedByAdminId());
+        dto.setAdminNote(req.getAdminNote());
+
+        return dto;
+    }
+
+
+    public boolean isAvailable(Long id, LocalDate date, LocalTime start, LocalTime end)
+    {
+        // TODO: Implement overlap and conflict checking when appointments are built
+        return true;
+    }
 }

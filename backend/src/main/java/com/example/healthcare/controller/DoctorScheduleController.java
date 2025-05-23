@@ -5,6 +5,7 @@ import com.example.healthcare.entity.Doctor;
 import com.example.healthcare.entity.DoctorSchedule.DoctorRecurringSchedule;
 import com.example.healthcare.entity.DoctorSchedule.DoctorOneTimeSlot;
 import com.example.healthcare.entity.DoctorSchedule.DoctorRecurringBreak;
+import com.example.healthcare.entity.DoctorSchedule.SlotRemovalRequest;
 import com.example.healthcare.security.SecurityUtils;
 import com.example.healthcare.service.DoctorScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -126,5 +127,22 @@ public class DoctorScheduleController {
     ) {
         Doctor doctor = securityUtils.getAuthenticatedDoctor();
         return doctorScheduleService.isAvailable(doctor.getId(), date, start, end);
+    }
+
+    // ========== SLOT REMOVAL REQUESTS ==========
+
+    // Doctor submits a removal request for a slot
+    @PostMapping("/removal-request")
+    public SlotRemovalRequestDto createSlotRemovalRequest(@RequestBody SlotRemovalRequestCreateDto dto) {
+        Doctor doctor = securityUtils.getAuthenticatedDoctor();
+        return doctorScheduleService.createSlotRemovalRequest(doctor.getId(), dto);
+    }
+
+
+    // (Optional) Doctor fetches their own requests
+    @GetMapping("/removal-requests")
+    public List<SlotRemovalRequestDto> getMyRemovalRequests() {
+        Doctor doctor = securityUtils.getAuthenticatedDoctor();
+        return doctorScheduleService.getRemovalRequestsForDoctor(doctor.getId());
     }
 }
