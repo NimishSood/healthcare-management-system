@@ -4,6 +4,15 @@ import toast from "react-hot-toast";
 import { isRecurringPast } from "../../../../utils/dateUtils.js";
 import { getMySlotRemovalRequests, submitSlotRemovalRequest } from "../../../../services/slotRemovalApi";
 
+// Reusable error toast helper
+function showApiErrorToast(err, fallback = "Something went wrong") {
+  toast.error(
+    err?.response?.data?.message ||
+    err?.response?.data ||
+    fallback
+  );
+}
+
 export default function RecurringSlotsSection({ slots, refresh }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -53,8 +62,8 @@ export default function RecurringSlotsSection({ slots, refresh }) {
       setForm({ dayOfWeek: "", startTime: "", endTime: "" });
       setShowAddModal(false);
       refresh();
-    } catch {
-      toast.error("Failed to add slot");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to add slot");
     } finally {
       setLoading(false);
     }
@@ -77,8 +86,8 @@ export default function RecurringSlotsSection({ slots, refresh }) {
       toast.success("Slot updated!");
       setShowEditModal(false);
       refresh();
-    } catch {
-      toast.error("Failed to update slot");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to update slot");
     } finally {
       setLoading(false);
     }
@@ -91,8 +100,8 @@ export default function RecurringSlotsSection({ slots, refresh }) {
       await axios.delete(`/doctor/schedule/recurring/${id}`);
       toast.success("Slot deleted!");
       refresh();
-    } catch {
-      toast.error("Failed to delete");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to delete");
     }
   };
 
@@ -118,8 +127,8 @@ export default function RecurringSlotsSection({ slots, refresh }) {
       setRemovalReason("");
       // Refresh requests after submission
       getMySlotRemovalRequests().then(setRemovalRequests).catch(() => {});
-    } catch {
-      toast.error("Failed to send removal request");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to send removal request");
     } finally {
       setRemovalLoading(false);
     }
@@ -349,20 +358,20 @@ export default function RecurringSlotsSection({ slots, refresh }) {
                       Delete
                     </button>
                     <button
-                    className={`text-yellow-600 hover:underline font-medium cursor-pointer ${pendingRequest ? "opacity-40 cursor-not-allowed" : ""}`}
-                    onClick={() => {
-                      if (pendingRequest) toast("Request already pending.");
-                      else openRemovalModal(slot);
-                    }}
-                    disabled={!!pendingRequest}
-                    title={
-                      pendingRequest
-                        ? "Removal request pending"
-                        : "Request Removal"
-                    }
-                  >
-                    {pendingRequest ? "Pending…" : "Request Remove"}
-                  </button>
+                      className={`text-yellow-600 hover:underline font-medium cursor-pointer ${pendingRequest ? "opacity-40 cursor-not-allowed" : ""}`}
+                      onClick={() => {
+                        if (pendingRequest) toast("Request already pending.");
+                        else openRemovalModal(slot);
+                      }}
+                      disabled={!!pendingRequest}
+                      title={
+                        pendingRequest
+                          ? "Removal request pending"
+                          : "Request Removal"
+                      }
+                    >
+                      {pendingRequest ? "Pending…" : "Request Remove"}
+                    </button>
                   </td>
                 </tr>
               );

@@ -4,6 +4,15 @@ import toast from "react-hot-toast";
 import { isOneTimeSlotPast } from "../../../../utils/dateUtils.js";
 import { getMySlotRemovalRequests, submitSlotRemovalRequest } from "../../../../services/slotRemovalApi";
 
+// Helper for error toast from axios error
+function showApiErrorToast(err, fallback = "Something went wrong") {
+  toast.error(
+    err?.response?.data?.message ||
+    err?.response?.data ||
+    fallback
+  );
+}
+
 export default function OneTimeSlotsSection({ slots, refresh }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -60,8 +69,8 @@ export default function OneTimeSlotsSection({ slots, refresh }) {
       setForm({ date: "", startTime: "", endTime: "", available: true });
       setShowAddModal(false);
       refresh();
-    } catch {
-      toast.error("Failed to add slot");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to add slot");
     } finally {
       setLoading(false);
     }
@@ -83,8 +92,8 @@ export default function OneTimeSlotsSection({ slots, refresh }) {
       toast.success("Slot updated!");
       setShowEditModal(false);
       refresh();
-    } catch {
-      toast.error("Failed to update slot");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to update slot");
     } finally {
       setLoading(false);
     }
@@ -97,8 +106,8 @@ export default function OneTimeSlotsSection({ slots, refresh }) {
       await axios.delete(`/doctor/schedule/onetime/${id}`);
       toast.success("Slot deleted!");
       refresh();
-    } catch {
-      toast.error("Failed to delete");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to delete");
     }
   };
 
@@ -124,8 +133,8 @@ export default function OneTimeSlotsSection({ slots, refresh }) {
       setRemovalReason("");
       // Refresh requests after submission
       getMySlotRemovalRequests().then(setRemovalRequests).catch(() => {});
-    } catch {
-      toast.error("Failed to send removal request");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to send removal request");
     } finally {
       setRemovalLoading(false);
     }

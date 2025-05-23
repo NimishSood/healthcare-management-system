@@ -4,6 +4,15 @@ import toast from "react-hot-toast";
 import { isRecurringPast } from "../../../../utils/dateUtils.js";
 import { getMySlotRemovalRequests, submitSlotRemovalRequest } from "../../../../services/slotRemovalApi";
 
+// Reusable error toast helper
+function showApiErrorToast(err, fallback = "Something went wrong") {
+  toast.error(
+    err?.response?.data?.message ||
+    err?.response?.data ||
+    fallback
+  );
+}
+
 export default function BreaksSection({ breaks, refresh }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -50,8 +59,8 @@ export default function BreaksSection({ breaks, refresh }) {
       setForm({ dayOfWeek: "", startTime: "", endTime: "" });
       setShowAddModal(false);
       refresh();
-    } catch {
-      toast.error("Failed to add break");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to add break");
     } finally {
       setLoading(false);
     }
@@ -74,8 +83,8 @@ export default function BreaksSection({ breaks, refresh }) {
       toast.success("Break updated!");
       setShowEditModal(false);
       refresh();
-    } catch {
-      toast.error("Failed to update break");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to update break");
     } finally {
       setLoading(false);
     }
@@ -88,8 +97,8 @@ export default function BreaksSection({ breaks, refresh }) {
       await axios.delete(`/doctor/schedule/break/${id}`);
       toast.success("Break deleted!");
       refresh();
-    } catch {
-      toast.error("Failed to delete");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to delete");
     }
   };
 
@@ -115,8 +124,8 @@ export default function BreaksSection({ breaks, refresh }) {
       setRemovalReason("");
       // Refresh requests after submission
       getMySlotRemovalRequests().then(setRemovalRequests).catch(() => {});
-    } catch {
-      toast.error("Failed to send removal request");
+    } catch (err) {
+      showApiErrorToast(err, "Failed to send removal request");
     } finally {
       setRemovalLoading(false);
     }
