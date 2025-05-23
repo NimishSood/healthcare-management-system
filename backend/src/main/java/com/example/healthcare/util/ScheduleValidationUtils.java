@@ -21,4 +21,10 @@ public class ScheduleValidationUtils {
         LocalTime now = LocalTime.now();
         return now.isAfter(endTime);
     }
+
+    public static boolean isTimeOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
+        // Example: slot1 = [10:00, 11:00), slot2 = [11:00, 12:00) should NOT overlap
+        return !start1.isAfter(end2) && !start2.isAfter(end1) && start1.isBefore(end2) && start2.isBefore(end1);
+        // Simpler: return start1.isBefore(end2) && start2.isBefore(end1);
+    }
 }

@@ -123,11 +123,23 @@ public class DoctorScheduleController {
     public boolean isAvailable(
             @RequestParam("date") LocalDate date,
             @RequestParam("start") LocalTime start,
-            @RequestParam("end") LocalTime end
+            @RequestParam("end") LocalTime end,
+            @RequestParam(value = "excludeId", required = false) Long excludeId,
+            @RequestParam(value = "type", required = false) String type // "SLOT" or "BREAK"
     ) {
         Doctor doctor = securityUtils.getAuthenticatedDoctor();
-        return doctorScheduleService.isAvailable(doctor.getId(), date, start, end);
+        // Use the day of week from the date
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return doctorScheduleService.isAvailable(
+                doctor.getId(),
+                dayOfWeek,
+                start,
+                end,
+                excludeId,
+                type
+        );
     }
+
 
     // ========== SLOT REMOVAL REQUESTS ==========
 
