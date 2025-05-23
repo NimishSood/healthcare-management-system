@@ -6,7 +6,6 @@ import BreaksSection from "../components/Schedule/BreaksSection";
 import RecurringSlotsSection from "../components/Schedule/RecurringSlotsSection";
 import OneTimeSlotsSection from "../components/Schedule/OneTimeSlotsSection";
 
-// Used for mapping days between frontend and backend
 const WEEK_DAYS = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
 
 function toLocalYMD(date) {
@@ -39,12 +38,12 @@ function mapDoctorScheduleToEvents(schedule, currentWeekStartDate) {
       const day = weekDates[dayIdx];
       if (day) {
         events.push({
-          id: String(slot.id), // Only DB id!
+          id: String(slot.id),
           title: 'Working Slot',
           start: `${toLocalYMD(day)}T${slot.startTime}`,
           end: `${toLocalYMD(day)}T${slot.endTime}`,
           backgroundColor: '#34d399',
-          type: "RECURRING",           // <-- add this for handler
+          type: "RECURRING",
         });
       }
     }
@@ -58,8 +57,8 @@ function mapDoctorScheduleToEvents(schedule, currentWeekStartDate) {
       end: `${slot.date}T${slot.endTime}`,
       backgroundColor: slot.available ? '#2563eb' : '#a1a1aa',
       textColor: '#fff',
-      type: "ONE_TIME",               // <-- add this for handler
-      available: slot.available,      // <-- for correct PUT payload
+      type: "ONE_TIME",
+      available: slot.available,
     });
   });
 
@@ -74,7 +73,7 @@ function mapDoctorScheduleToEvents(schedule, currentWeekStartDate) {
           start: `${toLocalYMD(day)}T${brk.startTime}`,
           end: `${toLocalYMD(day)}T${brk.endTime}`,
           backgroundColor: '#ef4444',
-          type: "BREAK",               // <-- add this for handler
+          type: "BREAK",
         });
       }
     }
@@ -110,25 +109,45 @@ export default function DoctorSchedulePage() {
   if (!schedule) return <div className="p-10 text-center text-gray-400">No schedule found.</div>;
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-6xl mx-auto py-8 px-2">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">My Schedule (Beta)</h1>
+        <h1 className="text-2xl font-bold pl-1">My Schedule (Beta)</h1>
       </div>
-
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
-        <RecurringSlotsSection slots={schedule.recurringSlots || []} refresh={refreshSchedule} />
-      </div>
-
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
-        <BreaksSection breaks={schedule.recurringBreaks || []} refresh={refreshSchedule} />
-      </div>
-
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
-        <OneTimeSlotsSection slots={schedule.oneTimeSlots || []} refresh={refreshSchedule} />
-      </div>
-
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
-        <DoctorScheduleCalendar events={events} refresh={refreshSchedule} />
+      {/* Responsive grid: 2 columns on md+, stacked on mobile */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        {/* Left: All slot sections */}
+        <div className="flex flex-col gap-6 min-h-[700px]">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-6">
+            <div className="flex items-center justify-between mb-2">
+              
+            </div>
+            <RecurringSlotsSection slots={schedule.recurringSlots || []} refresh={refreshSchedule} />
+          </div>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-6">
+            
+            <BreaksSection breaks={schedule.recurringBreaks || []} refresh={refreshSchedule} />
+          </div>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-6">
+            
+            <OneTimeSlotsSection slots={schedule.oneTimeSlots || []} refresh={refreshSchedule} />
+          </div>
+        </div>
+        {/* Right: Calendar with color legend */}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-6 md:sticky md:top-8 h-fit min-h-[700px] flex flex-col">
+          <DoctorScheduleCalendar events={events} refresh={refreshSchedule} />
+          {/* Color legend below calendar */}
+          <div className="flex gap-6 mt-4 justify-center">
+            <span className="flex items-center gap-2 text-sm">
+              <span className="inline-block w-3 h-3 rounded-full bg-green-400"></span> Working Slot
+            </span>
+            <span className="flex items-center gap-2 text-sm">
+              <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span> Break
+            </span>
+            <span className="flex items-center gap-2 text-sm">
+              <span className="inline-block w-3 h-3 rounded-full bg-blue-600"></span> One-Time Slot
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

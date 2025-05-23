@@ -137,7 +137,7 @@ export default function RecurringSlotsSection({ slots, refresh }) {
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-semibold">Weekly Recurring Slots</h2>
+        <h2 className="text-lg font-bold">Weekly Recurring Slots</h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-300 transition"
