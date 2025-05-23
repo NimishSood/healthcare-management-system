@@ -39,11 +39,12 @@ function mapDoctorScheduleToEvents(schedule, currentWeekStartDate) {
       const day = weekDates[dayIdx];
       if (day) {
         events.push({
-          id: `recurring-${slot.id}-${day.toDateString()}`,
+          id: String(slot.id), // Only DB id!
           title: 'Working Slot',
           start: `${toLocalYMD(day)}T${slot.startTime}`,
           end: `${toLocalYMD(day)}T${slot.endTime}`,
           backgroundColor: '#34d399',
+          type: "RECURRING",           // <-- add this for handler
         });
       }
     }
@@ -51,12 +52,14 @@ function mapDoctorScheduleToEvents(schedule, currentWeekStartDate) {
 
   schedule.oneTimeSlots.forEach(slot => {
     events.push({
-      id: `onetime-${slot.id}`,
+      id: String(slot.id),
       title: slot.available ? 'One-Time Slot' : 'Unavailable Slot',
       start: `${slot.date}T${slot.startTime}`,
       end: `${slot.date}T${slot.endTime}`,
       backgroundColor: slot.available ? '#2563eb' : '#a1a1aa',
-      textColor: '#fff'
+      textColor: '#fff',
+      type: "ONE_TIME",               // <-- add this for handler
+      available: slot.available,      // <-- for correct PUT payload
     });
   });
 
@@ -66,11 +69,12 @@ function mapDoctorScheduleToEvents(schedule, currentWeekStartDate) {
       const day = weekDates[dayIdx];
       if (day) {
         events.push({
-          id: `break-${brk.id}-${day.toDateString()}`,
+          id: String(brk.id),
           title: 'Break',
           start: `${toLocalYMD(day)}T${brk.startTime}`,
           end: `${toLocalYMD(day)}T${brk.endTime}`,
           backgroundColor: '#ef4444',
+          type: "BREAK",               // <-- add this for handler
         });
       }
     }
@@ -124,7 +128,7 @@ export default function DoctorSchedulePage() {
       </div>
 
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-4 mb-8">
-        <DoctorScheduleCalendar events={events} />
+        <DoctorScheduleCalendar events={events} refresh={refreshSchedule} />
       </div>
     </div>
   );
