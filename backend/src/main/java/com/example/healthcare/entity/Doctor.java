@@ -23,4 +23,8 @@ public class Doctor extends User {
     private Integer yearsOfExperience;
 
 
+    public String getFullName()
+    {
+        return getFirstName() + " " + getLastName();
+    }
 }
