@@ -9,6 +9,7 @@ import com.example.healthcare.security.SecurityUtils;
 import com.example.healthcare.service.AppointmentService;
 import com.example.healthcare.service.DoctorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -99,16 +100,13 @@ public class DoctorController {
         return "Prescription issued successfully.";
     }
 
+    @DeleteMapping("/appointments/{id}/cancel")
+    public ResponseEntity<Void> cancelAppointment(@PathVariable Long id) {
+        Doctor doctor = securityUtils.getAuthenticatedDoctor();
+        appointmentService.cancelAppointment(doctor.getId(), id);
+        return ResponseEntity.noContent().build();
+    }
 
-//    @GetMapping("/appointments/upcoming")
-//    public List<AppointmentDto> getUpcomingAppointmentsDto() {
-//        Patient patient = securityUtils.getAuthenticatedPatient();
-//        return appointmentService.getUpcomingAppointmentsDto(patient.getId(), false);
-//    }
-//
-//    @GetMapping("/appointments/history")
-//    public List<AppointmentDto> getPastAppointmentsDto() {
-//        Patient patient = securityUtils.getAuthenticatedPatient();
-//        return appointmentService.getPastAppointmentsDto(patient.getId(), false);
-//    }
+
+
 }
