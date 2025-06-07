@@ -40,13 +40,13 @@ public class DoctorScheduleService {
      */
     public boolean isAvailable(Long doctorId, DayOfWeek day, LocalTime start, LocalTime end, Long excludeId, String type) {
         // Check recurring slots
-        for (DoctorRecurringSchedule slot : recurringRepo.findByDoctorId(doctorId)) {
+        for (DoctorRecurringSchedule slot : recurringRepo.findByDoctorIdAndActiveTrue(doctorId)) {
             if (!slot.getDayOfWeek().equals(day)) continue;
             if (excludeId != null && slot.getId().equals(excludeId) && "RECURRING".equals(type)) continue;
             if (ScheduleValidationUtils.isTimeOverlap(start, end, slot.getStartTime(), slot.getEndTime())) return false;
         }
         // Check recurring breaks
-        for (DoctorRecurringBreak brk : breakRepo.findByDoctorId(doctorId)) {
+        for (DoctorRecurringBreak brk : breakRepo.findByDoctorIdAndActiveTrue(doctorId)) {
             if (!brk.getDayOfWeek().equals(day)) continue;
             if (excludeId != null && brk.getId().equals(excludeId) && "BREAK".equals(type)) continue;
             if (ScheduleValidationUtils.isTimeOverlap(start, end, brk.getStartTime(), brk.getEndTime())) return false;
@@ -73,12 +73,12 @@ public class DoctorScheduleService {
         // 2. Check recurring slots/breaks for that day of week
         DayOfWeek day = date.getDayOfWeek();
         // Recurring slots
-        for (DoctorRecurringSchedule slot : recurringRepo.findByDoctorId(doctorId)) {
+        for (DoctorRecurringSchedule slot : recurringRepo.findByDoctorIdAndActiveTrue(doctorId)) {
             if (!slot.getDayOfWeek().equals(day)) continue;
             if (ScheduleValidationUtils.isTimeOverlap(start, end, slot.getStartTime(), slot.getEndTime())) return false;
         }
         // Recurring breaks
-        for (DoctorRecurringBreak brk : breakRepo.findByDoctorId(doctorId)) {
+        for (DoctorRecurringBreak brk : breakRepo.findByDoctorIdAndActiveTrue(doctorId)) {
             if (!brk.getDayOfWeek().equals(day)) continue;
             if (ScheduleValidationUtils.isTimeOverlap(start, end, brk.getStartTime(), brk.getEndTime())) return false;
         }
@@ -89,7 +89,7 @@ public class DoctorScheduleService {
     // --- Recurring Schedule CRUD ---
 
     public List<DoctorRecurringSchedule> getRecurringSchedule(Long doctorId) {
-        return recurringRepo.findByDoctorId(doctorId);
+        return recurringRepo.findByDoctorIdAndActiveTrue(doctorId);
     }
 
     @Transactional
@@ -259,7 +259,7 @@ public class DoctorScheduleService {
     // --- Recurring Breaks CRUD ---
 
     public List<DoctorRecurringBreak> getRecurringBreaks(Long doctorId) {
-        return breakRepo.findByDoctorId(doctorId);
+        return breakRepo.findByDoctorIdAndActiveTrue(doctorId);
     }
 
     @Transactional
@@ -354,10 +354,10 @@ public class DoctorScheduleService {
         List<DoctorOneTimeSlot> oneTimeSlots = oneTimeRepo.findByDoctorIdAndDateBetween(doctorId, start, end);
         Set<DayOfWeek> rangeDays = start.datesUntil(end.plusDays(1))
                 .map(LocalDate::getDayOfWeek).collect(Collectors.toSet());
-        List<DoctorRecurringSchedule> recurringSlots = recurringRepo.findByDoctorId(doctorId).stream()
+        List<DoctorRecurringSchedule> recurringSlots = recurringRepo.findByDoctorIdAndActiveTrue(doctorId).stream()
                 .filter(slot -> rangeDays.contains(slot.getDayOfWeek()))
                 .collect(Collectors.toList());
-        List<DoctorRecurringBreak> recurringBreaks = breakRepo.findByDoctorId(doctorId).stream()
+        List<DoctorRecurringBreak> recurringBreaks = breakRepo.findByDoctorIdAndActiveTrue(doctorId).stream()
                 .filter(brk -> rangeDays.contains(brk.getDayOfWeek()))
                 .collect(Collectors.toList());
         return new DoctorFullScheduleDto(recurringSlots, oneTimeSlots, recurringBreaks);
@@ -446,6 +446,23 @@ public class DoctorScheduleService {
         req.setReason(dto.getReason());
         req.setStatus("PENDING");
         req.setRequestedAt(LocalDateTime.now());
+        // Immediately mark the targeted slot/break as inactive
+        switch (dto.getSlotType()) {
+            case "RECURRING" -> {
+                DoctorRecurringSchedule slot = recurringRepo.findById(dto.getSlotId()).orElseThrow();
+                if (Objects.equals(slot.getDoctor().getId(), doctorId)) {
+                    slot.setActive(false);
+                    recurringRepo.save(slot);
+                }
+            }
+            case "BREAK" -> {
+                DoctorRecurringBreak brk = breakRepo.findById(dto.getSlotId()).orElseThrow();
+                if (Objects.equals(brk.getDoctor().getId(), doctorId)) {
+                    brk.setActive(false);
+                    breakRepo.save(brk);
+                }
+            }
+        }
 
         try {
             slotRemovalRequestRepository.save(req);

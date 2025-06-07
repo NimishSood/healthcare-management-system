@@ -2,6 +2,7 @@
 package com.example.healthcare.util;
 
 import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 
 public class ScheduleValidationUtils {
     // For one-time slot: cannot add/edit/delete in the past (end time must be after now)
@@ -11,16 +12,16 @@ public class ScheduleValidationUtils {
         return slotEnd.isBefore(LocalDateTime.now());
     }
 
-    // For recurring: cannot add/update to a slot that would end before the current time (for today)
+    // For recurring: check the next occurrence of the dayOfWeek. If that
+    // occurrence's end time is before now, the slot is considered past.
     public static boolean isRecurringPast(DayOfWeek dayOfWeek, LocalTime endTime) {
         if (dayOfWeek == null || endTime == null) return false;
-        DayOfWeek today = LocalDate.now().getDayOfWeek();
-        if (dayOfWeek.getValue() < today.getValue()) return true; // Already passed this week
-        if (dayOfWeek.getValue() > today.getValue()) return false; // Later this week
-        // Today: check endTime
-        LocalTime now = LocalTime.now();
-        return now.isAfter(endTime);
+        LocalDate today = LocalDate.now();
+        LocalDate next = today.with(TemporalAdjusters.nextOrSame(dayOfWeek));
+        LocalDateTime endDateTime = LocalDateTime.of(next, endTime);
+        return endDateTime.isBefore(LocalDateTime.now());
     }
+
 
     public static boolean isTimeOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
         // Example: slot1 = [10:00, 11:00), slot2 = [11:00, 12:00) should NOT overlap

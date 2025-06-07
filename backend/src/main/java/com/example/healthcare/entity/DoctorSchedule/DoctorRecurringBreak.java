@@ -19,11 +19,16 @@ public class DoctorRecurringBreak {
     @ManyToOne(fetch = FetchType.LAZY)
     private Doctor doctor;
 
+
     @Enumerated(EnumType.STRING)
     private DayOfWeek dayOfWeek;
 
     private LocalTime startTime;
     private LocalTime endTime;
+
+    @Column(nullable = false)
+    private boolean active=true;
+
 
 
 }

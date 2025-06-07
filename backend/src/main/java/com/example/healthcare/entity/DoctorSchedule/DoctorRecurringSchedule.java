@@ -25,5 +25,8 @@ public class DoctorRecurringSchedule {
     private LocalTime startTime;
     private LocalTime endTime;
 
+    @Column(nullable = false)
+    private boolean active=true;
+
 
 }

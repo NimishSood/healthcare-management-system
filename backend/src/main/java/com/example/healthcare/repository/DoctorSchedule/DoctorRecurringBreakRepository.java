@@ -12,4 +12,10 @@ public interface DoctorRecurringBreakRepository extends JpaRepository<DoctorRecu
     List<DoctorRecurringBreak> findByDoctorIdAndDayOfWeek(Long doctorId, DayOfWeek dayOfWeek);
 
     void deleteByDoctorId(Long doctorId);
+
+    List<DoctorRecurringBreak> findByDoctorIdAndActiveTrue(Long doctorId);
+
+    List<DoctorRecurringBreak> findByDoctorIdAndDayOfWeekAndActiveTrue(Long doctorId, DayOfWeek dayOfWeek);
+
+
 }

@@ -15,5 +15,9 @@ public interface DoctorRecurringScheduleRepository extends JpaRepository<DoctorR
 
     void deleteByDoctorId(Long doctorId);
     // Add custom methods for overlap checks if needed
+
+    List<DoctorRecurringSchedule> findByDoctorIdAndActiveTrue(Long doctorId);
+
+    List<DoctorRecurringSchedule> findByDoctorIdAndDayOfWeekAndActiveTrue(Long doctorId, DayOfWeek dayOfWeek);
 }
 
