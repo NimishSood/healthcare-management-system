@@ -38,3 +38,12 @@ export async function cancelAppointment(appointmentId) {
   const { data } = await axios.delete(`/doctor/appointments/${appointmentId}/cancel`)
   return data
 }
+
+/**
+ * Fetch cancelled appointments for the authenticated doctor.
+ * @returns {Promise<Array>} list of cancelled appointments
+ */
+export async function getCancelledAppointments() {
+  const { data } = await axios.get('/doctor/appointments/cancelled')
+  return data
+}

@@ -107,6 +107,13 @@ public class DoctorController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/appointments/cancelled")
+    public List<AppointmentDto> getCancelledAppointments() {
+        Doctor doctor = securityUtils.getAuthenticatedDoctor();
+        return appointmentService.getCancelledAppointmentsForDoctor(doctor.getId());
+    }
+
+
 
 
 }

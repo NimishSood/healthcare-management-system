@@ -5,11 +5,13 @@ import {
   getUpcomingAppointments,
   getPastAppointments,
   markAppointmentComplete,
-  cancelAppointment
+  cancelAppointment,
+  getCancelledAppointments
 } from '../../../../services/doctorService'
 
 export default function DoctorAppointmentList() {
   const [upcoming, setUpcoming] = useState([])
+  const [cancelled, setCancelled] = useState([])
   const [past, setPast] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('upcoming')
@@ -19,12 +21,14 @@ export default function DoctorAppointmentList() {
   const load = async () => {
     setLoading(true)
     try {
-      const [upRes, pastRes] = await Promise.all([
+      const [upRes, pastRes, cancelledRes] = await Promise.all([
         getUpcomingAppointments(),
-        getPastAppointments()
+        getPastAppointments(),
+        getCancelledAppointments()
       ])
       setUpcoming(upRes)
       setPast(pastRes)
+      setCancelled(cancelledRes)
     } catch (err) {
       console.error('Failed to load appointments', err)
     } finally {
@@ -69,11 +73,13 @@ export default function DoctorAppointmentList() {
 
   const tabs = [
     { id: 'upcoming', label: 'Upcoming', count: upcoming.length },
+    { id: 'cancelled', label: 'Cancelled', count: cancelled.length },
     { id: 'past', label: 'Past', count: past.length }
   ]
 
   const sections = {
     upcoming,
+    cancelled,
     past
   }
 

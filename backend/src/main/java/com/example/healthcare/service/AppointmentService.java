@@ -209,4 +209,14 @@ public class AppointmentService {
                 .map(AppointmentMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    public List<AppointmentDto> getCancelledAppointmentsForDoctor(Long doctorId) {
+        return appointmentRepository
+                .findByDoctorIdAndStatus(doctorId, AppointmentStatus.CANCELLED)
+                .stream()
+                .map(AppointmentMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+
 }
