@@ -79,21 +79,4 @@ export default function DoctorScheduleCalendar({ events, refresh }) {
       slotMaxTime="21:00:00"
     />
   );
-
-
-
-  return (
-    <FullCalendar
-      plugins={[timeGridPlugin, interactionPlugin]}
-      initialView="timeGridWeek"
-      editable={true}
-      selectable={true}
-      events={events}
-      eventDrop={handleEventChange}
-      eventResize={handleEventChange}
-      height="auto"
-      slotMinTime="07:00:00"
-      slotMaxTime="21:00:00"
-    />
-  );
 }

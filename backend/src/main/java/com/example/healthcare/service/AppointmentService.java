@@ -27,6 +27,7 @@ public class AppointmentService {
     private final PatientRepository   patientRepository;
     private final UserRepository      userRepository;
     private final AuditLogService     auditLogService; // ✅ Injected Audit Log Service
+    private final DoctorScheduleService doctorScheduleService;
 
     // ✅ Patient Books an Appointment
     @Transactional
@@ -46,6 +47,12 @@ public class AppointmentService {
         if (appointmentRepository.existsByDoctorIdAndAppointmentTime(doctorId, appointmentTime)) {
             throw new IllegalArgumentException("This time slot is already booked.");
         }
+
+        // --- Verify the doctor is working at this time ---
+        if (!doctorScheduleService.isAppointmentTimeAvailable(doctorId, appointmentTime)) {
+            throw new IllegalArgumentException("Doctor is not available at the requested time.");
+        }
+
 
         // --- Create and populate appointment entity ---
         Appointment appointment = new Appointment();

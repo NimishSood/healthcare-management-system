@@ -522,4 +522,43 @@ public class DoctorScheduleService {
 
         return dto;
     }
+
+    /**
+     * Determine if the doctor is available for an appointment at the given time.
+     * This checks one-time overrides, recurring working slots and recurring breaks.
+     */
+    public boolean isAppointmentTimeAvailable(Long doctorId, LocalDateTime dateTime) {
+        LocalDate date = dateTime.toLocalDate();
+        LocalTime time = dateTime.toLocalTime();
+
+        // ----- One-time slots have highest priority -----
+        List<DoctorOneTimeSlot> oneTimes = oneTimeRepo.findByDoctorIdAndDate(doctorId, date);
+        for (DoctorOneTimeSlot slot : oneTimes) {
+            if (!time.isBefore(slot.getStartTime()) && time.isBefore(slot.getEndTime())) {
+                return slot.isAvailable();
+            }
+        }
+
+        // ----- Recurring working slots -----
+        boolean inWorkingSlot = false;
+        for (DoctorRecurringSchedule slot : recurringRepo
+                .findByDoctorIdAndDayOfWeekAndActiveTrue(doctorId, date.getDayOfWeek())) {
+            if (!time.isBefore(slot.getStartTime()) && time.isBefore(slot.getEndTime())) {
+                inWorkingSlot = true;
+                break;
+            }
+        }
+        if (!inWorkingSlot) return false;
+
+        // ----- Recurring breaks -----
+        for (DoctorRecurringBreak brk : breakRepo.findByDoctorIdAndActiveTrue(doctorId)) {
+            if (!brk.getDayOfWeek().equals(date.getDayOfWeek())) continue;
+            if (!time.isBefore(brk.getStartTime()) && time.isBefore(brk.getEndTime())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }
