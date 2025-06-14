@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/doctor")
@@ -48,9 +49,13 @@ public class DoctorController {
 
     // ✅ View Assigned Appointments (Upcoming)
     @GetMapping("/appointments/upcoming")
-    public List<Appointment> getUpcomingAppointments() {
+    public List<AppointmentDto> getUpcomingAppointments(@RequestParam(value = "limit", required = false) Integer limit) {
         Doctor doctor = securityUtils.getAuthenticatedDoctor();
-        return appointmentService.getUpcomingAppointments(doctor);
+        List<AppointmentDto> all = appointmentService.getUpcomingAppointmentsDto(doctor.getId(), true);
+        if (limit != null && limit > 0) {
+            return all.stream().limit(limit).collect(Collectors.toList());
+        }
+        return all;
     }
 
     // ✅ View Past Appointments
@@ -111,6 +116,18 @@ public class DoctorController {
     public List<AppointmentDto> getCancelledAppointments() {
         Doctor doctor = securityUtils.getAuthenticatedDoctor();
         return appointmentService.getCancelledAppointmentsForDoctor(doctor.getId());
+    }
+
+    @GetMapping("/prescriptions/pending/count")
+    public long countPendingPrescriptions() {
+        Doctor doctor = securityUtils.getAuthenticatedDoctor();
+        return doctorService.countPendingRefillRequests(doctor.getId());
+    }
+
+    @GetMapping("/messages/unread/count")
+    public long countUnreadMessages() {
+        Doctor doctor = securityUtils.getAuthenticatedDoctor();
+        return doctorService.countUnreadMessages(doctor.getId());
     }
 
 

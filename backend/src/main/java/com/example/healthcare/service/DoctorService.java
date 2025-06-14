@@ -125,6 +125,14 @@ public class DoctorService {
         return null;
     }
 
+    public long countPendingRefillRequests(Long doctorId) {
+        return prescriptionRepository.countByDoctorIdAndRefillRequestedTrueAndRefillStatus(doctorId, "PENDING");
+    }
+
+    public long countUnreadMessages(Long doctorId) {
+        return messageRepository.countByReceiverIdAndIsReadFalse(doctorId);
+    }
+
 
 
 }
