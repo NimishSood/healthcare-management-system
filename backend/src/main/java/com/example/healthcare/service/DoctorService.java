@@ -1,5 +1,6 @@
 package com.example.healthcare.service;
 
+import com.example.healthcare.dto.Profiles.PatientProfileDto;
 import com.example.healthcare.entity.*;
 import com.example.healthcare.entity.enums.AppointmentStatus;
 import com.example.healthcare.exception.AppointmentNotFoundException;
@@ -14,17 +15,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import com.example.healthcare.dto.Profiles.PatientProfileDto;
+import com.example.healthcare.dto.Profiles.ProfileMapper;
+import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class DoctorService {
 
-    private final  DoctorRepository doctorRepository;
+    private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
     private final PrescriptionRepository prescriptionRepository;
     private final MessageRepository messageRepository;
     private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
-
 
 
     @Transactional
@@ -115,13 +117,11 @@ public class DoctorService {
         );
     }
 
-    public List<Doctor> getAllDoctors()
-    {
+    public List<Doctor> getAllDoctors() {
         return doctorRepository.findAllByIsDeletedFalse();
     }
 
-    public List<?> getPrescriptions(Long id)
-    {
+    public List<?> getPrescriptions(Long id) {
         return null;
     }
 
@@ -134,5 +134,10 @@ public class DoctorService {
     }
 
 
-
+    public List<PatientProfileDto> getPatientsForDoctor(Long doctorId) {
+        return appointmentRepository.findPatientsByDoctorId(doctorId).stream()
+                .filter(u -> u instanceof Patient)
+                .map(u -> ProfileMapper.toPatientDto((Patient) u))
+                .collect(Collectors.toList());
+    }
 }

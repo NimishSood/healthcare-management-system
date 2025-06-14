@@ -11,6 +11,7 @@ import com.example.healthcare.service.DoctorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.healthcare.dto.Profiles.PatientProfileDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -128,6 +129,12 @@ public class DoctorController {
     public long countUnreadMessages() {
         Doctor doctor = securityUtils.getAuthenticatedDoctor();
         return doctorService.countUnreadMessages(doctor.getId());
+    }
+
+    @GetMapping("/patients")
+    public List<PatientProfileDto> listPatients() {
+        Doctor doctor = securityUtils.getAuthenticatedDoctor();
+        return doctorService.getPatientsForDoctor(doctor.getId());
     }
 
 

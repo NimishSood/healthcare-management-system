@@ -5,7 +5,8 @@ import {
   CalendarDaysIcon,
   ClipboardDocumentIcon,
   UserCircleIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  UsersIcon
 } from '@heroicons/react/24/outline'
 
 export default function DoctorLayout() {
@@ -14,6 +15,7 @@ export default function DoctorLayout() {
     { name: 'Appointments', path: '/doctor/appointments', icon: CalendarDaysIcon },
     { name: 'Schedule', path: '/doctor/schedule', icon:CalendarDaysIcon },
     { name: 'Prescriptions', path: '/doctor/prescriptions', icon: ClipboardDocumentIcon },
+    { name: 'Patients', path: '/doctor/patients', icon: UsersIcon },
     { name: 'Profile', path: '/doctor/profile', icon: UserCircleIcon },
     { name: 'Messages', path: '/doctor/messages', icon: ChatBubbleLeftRightIcon },
   ];

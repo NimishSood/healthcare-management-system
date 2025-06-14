@@ -71,3 +71,9 @@ export async function countUnreadMessages() {
   const { data } = await axios.get("/doctor/messages/unread/count");
   return data;
 }
+
+// Fetch list of patients for this doctor
+export async function getPatients() {
+  const { data } = await axios.get("/doctor/patients");
+  return data;
+}
