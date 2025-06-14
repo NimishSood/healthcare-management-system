@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import { getPatients } from '../../../services/doctorService';
 
 export default function DoctorPatientsPage() {
@@ -21,8 +22,11 @@ export default function DoctorPatientsPage() {
       <ul className="space-y-4">
         {patients.map(p => (
           <li key={p.id} className="bg-white p-4 rounded shadow">
-            <p className="font-medium">{p.firstName} {p.lastName}</p>
-            <p className="text-sm">{p.email} • {p.phoneNumber}</p>
+            <Link to={`/doctor/patients/${p.id}`}
+              className="block hover:underline">
+              <p className="font-medium">{p.firstName} {p.lastName}</p>
+              <p className="text-sm">{p.email} • {p.phoneNumber}</p>
+            </Link>
           </li>
         ))}
       </ul>

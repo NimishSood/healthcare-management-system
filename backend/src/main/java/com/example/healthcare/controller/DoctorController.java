@@ -136,6 +136,11 @@ public class DoctorController {
         Doctor doctor = securityUtils.getAuthenticatedDoctor();
         return doctorService.getPatientsForDoctor(doctor.getId());
     }
+    @GetMapping("/patients/{patientId}")
+    public PatientProfileDto getPatient(@PathVariable Long patientId) {
+        Doctor doctor = securityUtils.getAuthenticatedDoctor();
+        return doctorService.getPatientProfile(doctor.getId(), patientId);
+    }
 
 
 

@@ -12,6 +12,8 @@ import com.example.healthcare.repository.PrescriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.healthcare.repository.PatientRepository;
+import com.example.healthcare.exception.PatientNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +29,7 @@ public class DoctorService {
     private final PrescriptionRepository prescriptionRepository;
     private final MessageRepository messageRepository;
     private final AuditLogService auditLogService; // ✅ Injected Audit Log Service
+    private final PatientRepository patientRepository;
 
 
     @Transactional
@@ -137,7 +140,21 @@ public class DoctorService {
     public List<PatientProfileDto> getPatientsForDoctor(Long doctorId) {
         return appointmentRepository.findPatientsByDoctorId(doctorId).stream()
                 .filter(u -> u instanceof Patient)
+                .distinct()
                 .map(u -> ProfileMapper.toPatientDto((Patient) u))
                 .collect(Collectors.toList());
+    }
+
+    public PatientProfileDto getPatientProfile(Long doctorId, Long patientId) {
+        boolean related = appointmentRepository
+                .existsByDoctorIdAndPatientIdAndIsDeletedFalse(doctorId, patientId);
+        if (!related) {
+            throw new UnauthorizedAccessException("You do not have access to this patient.");
+        }
+
+        Patient patient = patientRepository.findByIdAndIsDeletedFalse(patientId)
+                .orElseThrow(() -> new PatientNotFoundException("Patient not found."));
+
+        return ProfileMapper.toPatientDto(patient);
     }
 }

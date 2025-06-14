@@ -77,3 +77,8 @@ export async function getPatients() {
   const { data } = await axios.get("/doctor/patients");
   return data;
 }
+// Fetch a single patient profile by ID
+export async function getPatient(id) {
+  const { data } = await axios.get(`/doctor/patients/${id}`);
+  return data;
+}
