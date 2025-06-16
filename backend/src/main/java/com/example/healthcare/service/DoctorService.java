@@ -124,8 +124,13 @@ public class DoctorService {
         return doctorRepository.findAllByIsDeletedFalse();
     }
 
-    public List<?> getPrescriptions(Long id) {
-        return null;
+    public List<Prescription> getPrescriptions(Long doctorId) {
+        return prescriptionRepository.findByDoctorIdAndIsDeletedFalse(doctorId);
+    }
+
+    public List<Prescription> getPendingRefillRequests(Long doctorId) {
+        return prescriptionRepository
+                .findByDoctorIdAndRefillRequestedTrueAndRefillStatus(doctorId, "PENDING");
     }
 
     public long countPendingRefillRequests(Long doctorId) {

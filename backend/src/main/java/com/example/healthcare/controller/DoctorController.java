@@ -5,6 +5,7 @@ import com.example.healthcare.dto.Profiles.DoctorProfileDto;
 import com.example.healthcare.dto.Profiles.ProfileMapper;
 import com.example.healthcare.entity.Appointment;
 import com.example.healthcare.entity.Doctor;
+import com.example.healthcare.entity.Prescription;
 import com.example.healthcare.security.SecurityUtils;
 import com.example.healthcare.service.AppointmentService;
 import com.example.healthcare.service.DoctorService;
@@ -92,9 +93,14 @@ public class DoctorController {
 
     // ✅ View Prescriptions Issued
     @GetMapping("/prescriptions")
-    public List<?> getPrescriptions() {
+    public List<Prescription >getPrescriptions() {
         Doctor doctor = securityUtils.getAuthenticatedDoctor();
         return doctorService.getPrescriptions(doctor.getId());
+    }
+    @GetMapping("/prescriptions/pending")
+    public List<Prescription> getPendingRefillRequests() {
+        Doctor doctor = securityUtils.getAuthenticatedDoctor();
+        return doctorService.getPendingRefillRequests(doctor.getId());
     }
 
     // ✅ Issue a New Prescription

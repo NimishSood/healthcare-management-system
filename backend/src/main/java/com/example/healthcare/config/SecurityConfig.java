@@ -83,6 +83,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/prescriptions").hasRole("DOCTOR")
                                 .requestMatchers(HttpMethod.DELETE, "/prescriptions/**").hasAnyRole("DOCTOR","ADMIN","OWNER")
                                 .requestMatchers(HttpMethod.GET, "/prescriptions/**").hasAnyRole("DOCTOR","ADMIN","OWNER","PATIENT")
+                                .requestMatchers(HttpMethod.PATCH, "/prescriptions/**").hasRole("DOCTOR")
 
 
 

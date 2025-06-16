@@ -234,4 +234,20 @@ public class PrescriptionService {
         prescriptionRepository.save(prescription);
     }
 
+    /**
+     * Get all prescriptions issued by the given doctor (not deleted).
+     */
+    public List<Prescription> getPrescriptionsForDoctor(Long doctorId) {
+        return prescriptionRepository.findByDoctorIdAndIsDeletedFalse(doctorId);
+    }
+
+    /**
+     * Get all prescriptions for this doctor that have a pending refill request.
+     */
+    public List<Prescription> getPendingRefillRequests(Long doctorId) {
+        return prescriptionRepository
+                .findByDoctorIdAndRefillRequestedTrueAndRefillStatus(doctorId, "PENDING");
+    }
 }
+
+

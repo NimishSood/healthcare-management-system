@@ -82,3 +82,31 @@ export async function getPatient(id) {
   const { data } = await axios.get(`/doctor/patients/${id}`);
   return data;
 }
+
+// Fetch all prescriptions issued by this doctor
+export async function getPrescriptions() {
+  const { data } = await axios.get("/doctor/prescriptions");
+  return data;
+}
+
+// Fetch pending refill requests for this doctor
+export async function getPendingRefillRequests() {
+  const { data } = await axios.get("/doctor/prescriptions/pending");
+  return data;
+}
+
+// Approve or deny a refill request
+export async function respondToRefill(id, approve) {
+  const { data } = await axios.patch(
+    `/prescriptions/${id}/refill-approve`,
+    null,
+    { params: { approve } }
+  );
+  return data;
+}
+
+// Issue a new prescription
+export async function issuePrescription(payload) {
+  const { data } = await axios.post("/prescriptions", payload);
+  return data;
+}

@@ -12,4 +12,5 @@ public interface PrescriptionRepository extends JpaRepository<Prescription,Long>
     List<Prescription> findByPatientIdAndIsDeletedFalse(Long patientId);
     List<Prescription> findByDoctorIdAndIsDeletedFalse(Long doctorId);
     long countByDoctorIdAndRefillRequestedTrueAndRefillStatus(Long doctorId, String refillStatus);
+    List<Prescription> findByDoctorIdAndRefillRequestedTrueAndRefillStatus(Long doctorId, String refillStatus);
 }
