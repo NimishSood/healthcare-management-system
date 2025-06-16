@@ -110,3 +110,9 @@ export async function issuePrescription(payload) {
   const { data } = await axios.post("/prescriptions", payload);
   return data;
 }
+
+// Fetch a prescription by ID
+export async function getPrescriptionById(id) {
+  const { data } = await axios.get(`/prescriptions/${id}`);
+  return data;
+}

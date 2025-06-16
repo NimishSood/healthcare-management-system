@@ -24,6 +24,7 @@ import DoctorProfilePage from './features/doctor-dashboard/pages/ProfilePage'
 import DoctorSchedulePage from './features/doctor-dashboard/pages/DoctorSchedulePage'
 import DoctorPatientsPage from './features/doctor-dashboard/pages/PatientsPage'
 import DoctorPatientDetailPage from './features/doctor-dashboard/pages/DoctorPatientDetailPage'
+import DoctorPrescriptionDetailPage from './features/doctor-dashboard/pages/PrescriptionDetailPage'
 
 import AdminLayout      from './features/admin-dashboard/layouts/AdminLayout'
 import OwnerLayout      from './features/owner-dashboard/layouts/OwnerLayout'
@@ -85,6 +86,7 @@ export default function App() {
             <Route index            element={<DoctorDashboardHome />} />
             <Route path="appointments"  element={<DoctorAppointmentsPage />} />
             <Route path="prescriptions" element={<DoctorPrescriptionsPage />} />
+            <Route path="prescriptions/:id" element={<DoctorPrescriptionDetailPage />} />
             <Route path="patients" element={<DoctorPatientsPage />} />
             <Route path="patients/:id" element={<DoctorPatientDetailPage />} />
             <Route path="profile"       element={<DoctorProfilePage />} />

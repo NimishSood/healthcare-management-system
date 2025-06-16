@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 import {
   getPendingRefillRequests,
   respondToRefill,
   getPatients,
-  issuePrescription
+  issuePrescription,
+  getPrescriptions
 } from '../../../services/doctorService'
 
 export default function DoctorPrescriptionsPage() {
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
   const [patients, setPatients] = useState([])
+  const [prescriptions, setPrescriptions] = useState([])
+  const [prescLoading, setPrescLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ patientId: '', medicationName: '', dosage: '', instructions: '', refillsLeft: 0 })
   const [saving, setSaving] = useState(false)
@@ -22,10 +26,18 @@ export default function DoctorPrescriptionsPage() {
       .catch(() => toast.error('Failed to load requests'))
       .finally(() => setLoading(false))
   }
+  const loadPrescriptions = () => {
+    setPrescLoading(true)
+    getPrescriptions()
+      .then(setPrescriptions)
+      .catch(() => toast.error('Failed to load prescriptions'))
+      .finally(() => setPrescLoading(false))
+  }
 
   useEffect(() => {
     loadRequests()
     getPatients().then(setPatients).catch(() => {})
+    loadPrescriptions()
   }, [])
 
   const handleAction = (id, approve) => {
@@ -151,6 +163,40 @@ export default function DoctorPrescriptionsPage() {
             </button>
           </div>
         )}
+        
+        <section>
+        <h2 className="text-xl font-semibold mb-2">Issued Prescriptions</h2>
+        {prescLoading ? (
+          <p>Loading…</p>
+        ) : prescriptions.length ? (
+          <ul className="space-y-4">
+            {prescriptions
+              .slice()
+              .sort((a, b) => new Date(b.dateIssued) - new Date(a.dateIssued))
+              .map(p => (
+                <li key={p.id}>
+                  <Link
+                    to={`/doctor/prescriptions/${p.id}`}
+                    className="block bg-white p-4 rounded shadow hover:shadow-md"
+                  >
+                    <p className="font-medium">
+                      {p.medicationName} — {p.patient?.firstName}{' '}
+                      {p.patient?.lastName}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Issued:{' '}
+                      {p.dateIssued
+                        ? new Date(p.dateIssued).toLocaleDateString()
+                        : 'N/A'}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500">No prescriptions issued.</p>
+        )}
+      </section>
       </section>
     </div>
   )
