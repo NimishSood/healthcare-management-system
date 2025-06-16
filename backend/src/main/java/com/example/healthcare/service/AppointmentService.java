@@ -44,13 +44,17 @@ public class AppointmentService {
         }
 
         // --- Prevent double-booking ---
-        if (appointmentRepository.existsByDoctorIdAndAppointmentTime(doctorId, appointmentTime)) {
+        List<AppointmentStatus> activeStatuses = List.of(
+                AppointmentStatus.BOOKED,
+                AppointmentStatus.RESCHEDULED
+        );
+
+        if (appointmentRepository.existsByDoctorIdAndAppointmentTimeAndStatusIn(doctorId, appointmentTime, activeStatuses)) {
             throw new IllegalArgumentException("This time slot is already booked.");
         }
 
-        // --- Verify the doctor is working at this time ---
-        if (!doctorScheduleService.isAppointmentTimeAvailable(doctorId, appointmentTime)) {
-            throw new IllegalArgumentException("Doctor is not available at the requested time.");
+        if (appointmentRepository.existsByPatientIdAndAppointmentTimeAndStatusIn(patientId, appointmentTime, activeStatuses)) {
+            throw new IllegalArgumentException("You already have an appointment at this time.");
         }
 
 

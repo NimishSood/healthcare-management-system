@@ -35,8 +35,17 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     // ✅ Find appointments by status (BOOKED, COMPLETED, CANCELLED)
     List<Appointment> findByStatus(AppointmentStatus status);
 
-    // ✅ Check if an appointment slot is available for a doctor
-    boolean existsByDoctorIdAndAppointmentTime(Long doctorId, LocalDateTime appointmentTime);
+
+    // ✅ Check if an appointment slot is available for a doctor, considering only active appointments
+    boolean existsByPatientIdAndAppointmentTimeAndStatusIn(
+            Long patientId,
+            LocalDateTime appointmentTime,
+            Collection<AppointmentStatus> statuses);
+
+    boolean existsByDoctorIdAndAppointmentTimeAndStatusIn(
+            Long doctorId,
+            LocalDateTime appointmentTime,
+            Collection<AppointmentStatus> statuses);
 
     List<Appointment> findByDoctorAndAppointmentTimeBeforeAndIsDeletedFalse(Doctor doctor, LocalDateTime now);
 
