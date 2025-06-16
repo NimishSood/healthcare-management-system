@@ -57,6 +57,10 @@ public class AppointmentService {
             throw new IllegalArgumentException("You already have an appointment at this time.");
         }
 
+        // --- Check doctor's schedule availability ---
+        if (!doctorScheduleService.isAppointmentTimeAvailable(doctorId, appointmentTime)) {
+            throw new IllegalArgumentException("Doctor's schedule is not available for this time.");
+        }
 
         // --- Create and populate appointment entity ---
         Appointment appointment = new Appointment();

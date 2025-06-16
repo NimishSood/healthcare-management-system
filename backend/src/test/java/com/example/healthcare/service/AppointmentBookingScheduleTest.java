@@ -71,6 +71,7 @@ public class AppointmentBookingScheduleTest {
         LocalDateTime time = LocalDateTime.now().plusDays(1);
         when(patientRepository.findById(2L)).thenReturn(Optional.of(patient));
         when(appointmentRepository.existsByDoctorIdAndAppointmentTimeAndStatusIn(eq(1L), eq(time), anyCollection())).thenReturn(false);
+        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
         when(appointmentRepository.existsByPatientIdAndAppointmentTimeAndStatusIn(eq(2L), eq(time), anyCollection())).thenReturn(false);
         when(appointmentRepository.existsByDoctorIdAndAppointmentTimeAndStatusIn(eq(1L), eq(time), anyCollection()))
                 .thenReturn(false);
