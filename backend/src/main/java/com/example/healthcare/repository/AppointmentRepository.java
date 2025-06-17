@@ -68,4 +68,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // Fetch cancelled appointments for a doctor
     List<Appointment> findByDoctorIdAndStatus(Long doctorId, AppointmentStatus status);
+
+    // Fetch appointments for a doctor within a specific date range
+    List<Appointment> findByDoctorIdAndAppointmentTimeBetween(Long doctorId, LocalDateTime start, LocalDateTime end);
 }

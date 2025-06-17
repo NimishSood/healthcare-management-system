@@ -10,8 +10,10 @@ import {
 export default function BookAppointmentPage() {
   const [doctors, setDoctors] = useState([])
   const [loading, setLoading] = useState(true)
-  const [form, setForm] = useState({ doctorId: '', dateTime: '' })
+  const [form, setForm] = useState({ doctorId: '', date: '', time: '' })
   const [errors, setErrors] = useState({})
+  const [slots, setSlots] = useState([])
+  const [loadingSlots, setLoadingSlots] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
 
@@ -26,10 +28,25 @@ export default function BookAppointmentPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => {
+    if (!form.doctorId || !form.date) {
+      setSlots([])
+      return
+    }
+    setLoadingSlots(true)
+    axios.get(`/patient/doctors/${form.doctorId}/available-slots`, {
+      params: { date: form.date }
+    })
+      .then(res => setSlots(res.data))
+      .catch(() => toast.error('Failed to load slots'))
+      .finally(() => setLoadingSlots(false))
+  }, [form.doctorId, form.date])
+
   const handleSubmit = () => {
     const errs = {}
     if (!form.doctorId) errs.doctorId = 'Please select a doctor.'
-    if (!form.dateTime) errs.dateTime = 'Please choose date & time.'
+    if (!form.date) errs.date = 'Please choose a date.'
+    if (!form.time) errs.time = 'Please select a time.'
     setErrors(errs)
     if (Object.keys(errs).length) return
 
@@ -38,7 +55,7 @@ export default function BookAppointmentPage() {
       axios.post('/patient/appointments/book', null, {
         params: {
           doctorId: form.doctorId,
-          appointmentTime: form.dateTime,
+          appointmentTime: `${form.date}T${form.time}`,
         }
       }),
       {
@@ -90,20 +107,45 @@ export default function BookAppointmentPage() {
             )}
           </div>
 
-          {/* Date & Time */}
+          {/* Date */}
           <div>
-            <label className="block font-medium mb-1">Date &amp; Time</label>
+            <label className="block font-medium mb-1">Date</label>
             <input
-              type="datetime-local"
-              min={new Date().toISOString().slice(0,16)}
+              type="date"
+              min={new Date().toISOString().slice(0,10)}
               className="w-full border rounded p-2"
-              value={form.dateTime}
-              onChange={e => setForm({ ...form, dateTime: e.target.value })}
+              value={form.date}
+              onChange={e => setForm({ ...form, date: e.target.value })}
             />
-            {errors.dateTime && (
-              <p className="text-red-600 text-xs mt-1">{errors.dateTime}</p>
+            {errors.date && (
+              <p className="text-red-600 text-xs mt-1">{errors.date}</p>
             )}
           </div>
+
+          {/* Time Slot */}
+          {form.date && (
+            <div>
+              <label className="block font-medium mb-1">Time</label>
+              {loadingSlots ? (
+                <p>Loading…</p>
+              ) : (
+                <select
+                  className="w-full border rounded p-2"
+                  value={form.time}
+                  onChange={e => setForm({ ...form, time: e.target.value })}
+                >
+                  <option value="">— Select Time —</option>
+                  {slots.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              )}
+              {errors.time && (
+                <p className="text-red-600 text-xs mt-1">{errors.time}</p>
+              )}
+            </div>
+          )}
+
 
           {/* Actions */}
           <div className="mt-6 flex justify-end space-x-3">

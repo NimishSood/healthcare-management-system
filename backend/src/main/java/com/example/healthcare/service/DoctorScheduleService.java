@@ -11,11 +11,11 @@ import com.example.healthcare.util.ScheduleValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.healthcare.repository.AppointmentRepository;
+import com.example.healthcare.entity.Appointment;
+import com.example.healthcare.entity.enums.AppointmentStatus;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +29,7 @@ public class DoctorScheduleService {
     private final DoctorRecurringBreakRepository breakRepo;
     private final SlotRemovalRequestRepository slotRemovalRequestRepository;
     private final AuditLogService auditLogService;
+    private final AppointmentRepository appointmentRepository;
 
     // === Availability Check for Overlaps (Used in All Add/Update Ops) ===
     /**
@@ -560,5 +561,92 @@ public class DoctorScheduleService {
 
         return true;
     }
+    /**
+     * Generate available appointment start times for a doctor on a given date.
+     * This accounts for recurring slots, breaks, one-time overrides and existing appointments.
+     */
+    public List<LocalTime> getAvailableSlots(Long doctorId, LocalDate date, Duration apptLength) {
+        DayOfWeek day = date.getDayOfWeek();
+
+        // Base working intervals from recurring slots
+        List<TimeRange> working = new ArrayList<>();
+        for (DoctorRecurringSchedule slot : recurringRepo
+                .findByDoctorIdAndDayOfWeekAndActiveTrue(doctorId, day)) {
+            working.add(new TimeRange(slot.getStartTime(), slot.getEndTime()));
+        }
+
+        // One-time overrides for the date
+        List<TimeRange> blocked = new ArrayList<>();
+        for (DoctorOneTimeSlot slot : oneTimeRepo.findByDoctorIdAndDate(doctorId, date)) {
+            TimeRange tr = new TimeRange(slot.getStartTime(), slot.getEndTime());
+            if (slot.isAvailable()) {
+                working.add(tr);
+            } else {
+                blocked.add(tr);
+            }
+        }
+
+        // Recurring breaks
+        for (DoctorRecurringBreak brk : breakRepo
+                .findByDoctorIdAndDayOfWeekAndActiveTrue(doctorId, day)) {
+            blocked.add(new TimeRange(brk.getStartTime(), brk.getEndTime()));
+        }
+
+        // Existing appointments block time
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+        for (Appointment appt : appointmentRepository
+                .findByDoctorIdAndAppointmentTimeBetween(doctorId, startOfDay, endOfDay)) {
+            if (appt.getStatus() == AppointmentStatus.BOOKED ||
+                    appt.getStatus() == AppointmentStatus.RESCHEDULED) {
+                LocalTime start = appt.getAppointmentTime().toLocalTime();
+                blocked.add(new TimeRange(start, start.plus(apptLength)));
+            }
+        }
+
+        // Remove blocked intervals from working times
+        List<TimeRange> available = subtractRanges(working, blocked);
+
+        // Generate slot start times
+        Set<LocalTime> result = new TreeSet<>();
+        for (TimeRange tr : available) {
+            LocalTime t = tr.start;
+            while (!t.plus(apptLength).isAfter(tr.end)) {
+                result.add(t);
+                t = t.plus(apptLength);
+            }
+        }
+        return new ArrayList<>(result);
+    }
+
+    private static List<TimeRange> subtractRanges(List<TimeRange> bases, List<TimeRange> blocks) {
+        List<TimeRange> result = new ArrayList<>(bases);
+        for (TimeRange block : blocks) {
+            List<TimeRange> updated = new ArrayList<>();
+            for (TimeRange base : result) {
+                updated.addAll(subtract(base, block));
+            }
+            result = updated;
+        }
+        return result;
+    }
+
+    private static List<TimeRange> subtract(TimeRange base, TimeRange block) {
+        if (block.end.isBefore(base.start) || !block.start.isBefore(base.end)) {
+            return List.of(base);
+        }
+        if (block.start.compareTo(base.start) <= 0 && block.end.compareTo(base.end) >= 0) {
+            return List.of();
+        }
+        if (block.start.compareTo(base.start) <= 0) {
+            return List.of(new TimeRange(block.end, base.end));
+        }
+        if (block.end.compareTo(base.end) >= 0) {
+            return List.of(new TimeRange(base.start, block.start));
+        }
+        return List.of(new TimeRange(base.start, block.start), new TimeRange(block.end, base.end));
+    }
+
+    private record TimeRange(LocalTime start, LocalTime end) {}
 
 }

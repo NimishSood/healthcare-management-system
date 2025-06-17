@@ -10,6 +10,7 @@ import com.example.healthcare.security.SecurityUtils;
 import com.example.healthcare.service.AppointmentService;
 import com.example.healthcare.service.DoctorService;
 import com.example.healthcare.service.PatientService;
+import com.example.healthcare.service.DoctorScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/patient")
@@ -27,6 +31,7 @@ public class PatientController {
     private final AppointmentService appointmentService;
     private final SecurityUtils securityUtils;
     private final DoctorService doctorService;
+    private final DoctorScheduleService doctorScheduleService;
 
     /**
      * GET /patient/profile
@@ -223,4 +228,15 @@ public class PatientController {
         Patient p = securityUtils.getAuthenticatedPatient();
         return appointmentService.getCancelledAppointmentsDto(p.getId());
     }
+
+    @GetMapping("/doctors/{doctorId}/available-slots")
+    public List<LocalTime> getAvailableSlots(
+            @PathVariable Long doctorId,
+            @RequestParam("date") LocalDate date,
+            @RequestParam(value = "length", required = false, defaultValue = "30") long minutes
+    ) {
+        Duration duration = Duration.ofMinutes(minutes);
+        return doctorScheduleService.getAvailableSlots(doctorId, date, duration);
+    }
+
 }
