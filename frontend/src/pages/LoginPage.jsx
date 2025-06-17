@@ -23,18 +23,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <div className="mb-4 flex justify-center">
             <div className="bg-blue-100 p-3 rounded-full">
               <LockClosedIcon className="h-8 w-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             Secure Healthcare Login
           </h2>
-          <p className="text-gray-600">Access your medical records and appointments</p>
+          <p className="text-gray-600 dark:text-gray-400">Access your medical records and appointments</p>
         </div>
 
         {error && (
@@ -46,7 +46,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email Address
             </label>
             <div className="relative">
@@ -63,7 +63,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Password
             </label>
             <div className="relative">
@@ -98,13 +98,13 @@ export default function LoginPage() {
                 type="checkbox"
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
                 Remember me
               </label>
             </div>
             <Link
               to="/forgot-password"
-              className="text-sm text-blue-600 hover:text-blue-800"
+              className="text-sm text-blue-600 hover:text-blue-800 dark:hover:text-blue-400"
             >
               Forgot password?
             </Link>
@@ -142,11 +142,11 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Don't have an account?{' '}
             <Link
               to="/register"
-              className="font-semibold text-blue-600 hover:text-blue-800"
+              className="font-semibold text-blue-600 hover:text-blue-800 dark:hover:text-blue-400"
             >
               Register for care
             </Link>
@@ -154,13 +154,13 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-8 border-t pt-6 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             By continuing, you agree to our{' '}
-            <Link to="/terms" className="text-blue-600 hover:text-blue-800">
+            <Link to="/terms" className="text-blue-600 hover:text-blue-800 dark:hover:text-blue-400">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/privacy" className="text-blue-600 hover:text-blue-800">
+            <Link to="/privacy" className="text-blue-600 hover:text-blue-800 dark:hover:text-blue-400">
               Privacy Policy
             </Link>
           </p>

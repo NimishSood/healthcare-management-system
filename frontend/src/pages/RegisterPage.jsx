@@ -57,7 +57,7 @@ export default function RegisterPage() {
       ) : (
         <XCircleIcon className="h-4 w-4 text-red-600" />
       )}
-      <span className={valid ? 'text-green-700' : 'text-gray-600'}>{text}</span>
+      <span className={valid ? 'text-green-700' : 'text-gray-600 dark:text-gray-400'}>{text}</span>
     </li>
   );
 
@@ -100,18 +100,18 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <div className="mb-4 flex justify-center">
             <div className="bg-blue-100 p-3 rounded-full">
               <UserCircleIcon className="h-8 w-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             Create Your Health Profile
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Secure access to medical services and appointment management
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function RegisterPage() {
           {/* Personal Information */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 First Name
               </label>
               <div className="relative">
@@ -144,7 +144,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Last Name
               </label>
               <div className="relative">
@@ -161,7 +161,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Date of Birth
               </label>
               <div className="relative">
@@ -180,7 +180,7 @@ export default function RegisterPage() {
           {/* Contact & Security */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -197,7 +197,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Phone Number
               </label>
               <div className="relative">
@@ -214,7 +214,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -241,7 +241,7 @@ export default function RegisterPage() {
               </div>
               
               <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-700 mb-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Password must contain:
                 </p>
                 <ul className="grid grid-cols-2 gap-2 text-sm">
@@ -270,7 +270,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Confirm Password
               </label>
               <div className="relative">
@@ -334,11 +334,11 @@ export default function RegisterPage() {
         </form>
 
         <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
             <Link
               to="/login"
-              className="font-semibold text-blue-600 hover:text-blue-800"
+              className="font-semibold text-blue-600 hover:text-blue-800 dark:hover:text-blue-400"
             >
               Sign in here
             </Link>
@@ -346,13 +346,13 @@ export default function RegisterPage() {
         </div>
 
         <div className="mt-8 border-t pt-6 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             By registering, you agree to our{' '}
-            <Link to="/terms" className="text-blue-600 hover:text-blue-800">
+            <Link to="/terms" className="text-blue-600 hover:text-blue-800 dark:hover:text-blue-400">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/privacy" className="text-blue-600 hover:text-blue-800">
+            <Link to="/privacy" className="text-blue-600 hover:text-blue-800 dark:hover:text-blue-400">
               Privacy Policy
             </Link>
           </p>

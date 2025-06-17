@@ -10,15 +10,13 @@ import {
   TrashIcon,
   LockClosedIcon,
   XCircleIcon,
-  MoonIcon,
-  SunIcon,
+
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { useTheme } from "/src/context/ThemeContext";
+import ThemeToggle from "../../../components/ThemeToggle";
 import { AuthContext } from "/src/context/AuthContext";
 
 export default function DoctorProfilePage() {
-  const { theme, toggleTheme } = useTheme();
   const { logout } = useContext(AuthContext);
 
   const [user, setUser] = useState(null);
@@ -105,17 +103,7 @@ export default function DoctorProfilePage() {
   return (
     <div className="max-w-5xl mx-auto p-8 w-full bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors relative">
       {/* Theme toggle button */}
-      <button
-        className="absolute top-4 right-8 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full p-2 shadow transition z-20"
-        aria-label="Toggle theme"
-        onClick={toggleTheme}
-      >
-        {theme === "dark" ? (
-          <SunIcon className="h-5 w-5 text-yellow-400" />
-        ) : (
-          <MoonIcon className="h-5 w-5 text-blue-400" />
-        )}
-      </button>
+      <ThemeToggle className="absolute top-4 right-8 z-20" />
 
       <div className="flex flex-col md:flex-row md:gap-12">
         {/* LEFT: Profile Info */}

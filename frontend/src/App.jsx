@@ -34,6 +34,7 @@ import BookAppointmentPage from './features/patient-dashboard/pages/BookAppointm
 import TestPasswordPage from './features/patient-dashboard/pages/TestPasswordPage'
 import { ThemeProvider } from './context/ThemeContext'
 import PrescriptionDetailPage from './features/patient-dashboard/pages/PrescriptionDetailPage'
+import AppHeader from './components/AppHeader'
 
 
 
@@ -41,6 +42,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
+        <AppHeader />
         {/* Toast container for react-hot-toast */}
         <Toaster position="top-right" />
 
