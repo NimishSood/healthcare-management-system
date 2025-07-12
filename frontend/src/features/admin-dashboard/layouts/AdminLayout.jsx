@@ -18,7 +18,7 @@ export default function AdminLayout() {
       icon: SparklesIcon,
       end: true,
     },
-    { name: 'AI Query', path: '/admin/ai/query', icon: SparklesIcon },
+    
   ];
 
   return (
