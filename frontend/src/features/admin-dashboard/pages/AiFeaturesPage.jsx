@@ -15,8 +15,9 @@ export default function AiFeaturesPage() {
         query,
         patient_id: patientId,
       });
-      
-      setResponse(data);
+      const formatted =
+        typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      setResponse(formatted);
 
     } catch (err) {
       console.error('AI request failed', err);
@@ -51,7 +52,9 @@ export default function AiFeaturesPage() {
           {loading ? 'Sending…' : 'Send'}
         </button>
       </form>
-      {response && <div className="bg-gray-100 p-4 rounded">{response}</div>}
+      {response && (
+        <pre className="bg-gray-100 p-4 rounded whitespace-pre-wrap">{response}</pre>
+      )}
     </div>
   );
 }
