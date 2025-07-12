@@ -6,8 +6,11 @@ import com.example.healthcare.entity.Patient;
 import com.example.healthcare.entity.Prescription;
 import com.example.healthcare.entity.User;
 import com.example.healthcare.security.SecurityUtils;
+import com.example.healthcare.service.DoctorService;
 import com.example.healthcare.service.PrescriptionService;
+import com.example.healthcare.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -24,6 +27,7 @@ public class PrescriptionController {
 
     private final PrescriptionService prescriptionService;
     private final SecurityUtils securityUtils;  // Utility to get current user/doctor/patient
+    private final UserService userService;
 
     /** POST /prescriptions - Create a new prescription (Doctors only) */
     @PostMapping
@@ -74,16 +78,55 @@ public class PrescriptionController {
     }
 
     @GetMapping("/mine")
-    @PreAuthorize("hasRole('PATIENT')")
-    public ResponseEntity<?> getMyPrescriptions() {
-        User user = securityUtils.getAuthenticatedUser();
-        if (!(user instanceof Patient)) {
-            return ResponseEntity.badRequest().body("Authenticated user is not a patient.");
+    @PreAuthorize("hasAnyRole('PATIENT','ADMIN','DOCTOR','OWNER')")
+    public ResponseEntity<?> getMyPrescriptions(
+            @RequestParam(value = "patientId", required = false) Long patientId
+    ) {
+        // 1) Determine caller’s role
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
+                        a.getAuthority().equals("ROLE_OWNER"));
+        boolean isDoctor= auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_DOCTOR"));
+
+        // 2) Figure out effective patientId and currentUser
+        Long effectiveId;
+        User effectiveUser;
+
+        User caller = securityUtils.getAuthenticatedUser();
+
+        if (patientId != null && (isAdmin || isDoctor)) {
+            // admins and doctors can specify any patient
+            effectiveId   = patientId;
+            // load the actual User (must be Patient) for service checks
+            User fetched = userService.getUserById(effectiveId);
+            if (!(fetched instanceof Patient)) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("No patient found with id " + effectiveId);
+            }
+            effectiveUser = fetched;
+        } else {
+            // patients always use their own
+            if (!(caller instanceof Patient)) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body("Only patients may omit patientId.");
+            }
+            effectiveUser = caller;
+            effectiveId   = ((Patient) caller).getId();
         }
-        Patient patient = (Patient) user;
-        List<Prescription> prescriptions = prescriptionService.getPrescriptionsByPatient(patient.getId(), patient);
+
+        // 3) Call service with both parameters
+        List<Prescription> prescriptions =
+                prescriptionService.getPrescriptionsByPatient(effectiveId, effectiveUser);
+
+        // 4) Return the list
         return ResponseEntity.ok(prescriptions);
     }
+
+
 
 
     // Patient requests a refill

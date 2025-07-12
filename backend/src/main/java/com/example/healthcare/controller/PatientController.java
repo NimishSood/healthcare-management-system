@@ -13,6 +13,8 @@ import com.example.healthcare.service.PatientService;
 import com.example.healthcare.service.DoctorScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -169,11 +171,22 @@ public class PatientController {
      */
     @GetMapping("/appointments/upcoming")
     public List<AppointmentDto> getUpcomingAppointments(
-            @RequestParam(value = "limit", required = false) Integer limit
+            @RequestParam(value = "limit",     required = false) Integer limit,
+            @RequestParam(value = "patientId", required = false) Long    patientId
     ) {
-        Patient patient = securityUtils.getAuthenticatedPatient();
+        // 1) Figure out which patient to load: if an ADMIN passed-in a patientId, use it;
+        //    otherwise (or for PATIENTs) fall back to the JWT‐derived patient.
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        Long id = (patientId != null && isAdmin)
+                ? patientId
+                : securityUtils.getAuthenticatedPatient().getId();
+
+        // 2) Fetch the appointments for that ID, exactly as before
         List<AppointmentDto> all = appointmentService
-                .getUpcomingAppointmentsDto(patient.getId(), false);
+                .getUpcomingAppointmentsDto(id, false);
 
         if (limit != null && limit > 0) {
             return all.stream().limit(limit).collect(Collectors.toList());
@@ -187,11 +200,21 @@ public class PatientController {
      */
     @GetMapping("/appointments/history")
     public List<AppointmentDto> getPastAppointments(
-            @RequestParam(value = "since", required = false) String since
+            @RequestParam(value = "since",     required = false) String since,
+            @RequestParam(value = "patientId", required = false) Long   patientId
     ) {
-        Patient patient = securityUtils.getAuthenticatedPatient();
+        // Same ID‐selection logic
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        Long id = (patientId != null && isAdmin)
+                ? patientId
+                : securityUtils.getAuthenticatedPatient().getId();
+
+        // Existing history fetch
         List<AppointmentDto> all = appointmentService
-                .getPastAppointmentsDto(patient.getId(), false);
+                .getPastAppointmentsDto(id, false);
 
         if (since != null) {
             LocalDateTime cutoff = LocalDateTime.parse(since);

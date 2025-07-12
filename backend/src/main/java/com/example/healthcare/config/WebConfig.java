@@ -8,7 +8,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173", "http://localhost:5174","http://localhost:5175" ) // Match Vite ports
+                .allowedOrigins("http://localhost:5173", "http://localhost:5174","http://localhost:5175", "http://localhost:8080") // Match Vite ports
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
