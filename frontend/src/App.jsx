@@ -11,7 +11,7 @@ import PrivateRoute  from './components/PrivateRoute'
 import MessagePage from './components/messaging/MessagePage'
 
 import PatientLayout    from './features/patient-dashboard/layouts/PatientLayout'
-import DashboardHome    from './features/patient-dashboard/pages/DashboardHome'
+import PatientDashboardHome    from './features/patient-dashboard/pages/DashboardHome'
 import { AppointmentList } from './features/patient-dashboard/components/Appointments/AppointmentList'
 import PrescriptionsPage from './features/patient-dashboard/pages/PrescriptionsPage'
 import PatientProfilePage      from './features/patient-dashboard/pages/ProfilePage'
@@ -27,6 +27,14 @@ import DoctorPatientDetailPage from './features/doctor-dashboard/pages/DoctorPat
 import DoctorPrescriptionDetailPage from './features/doctor-dashboard/pages/PrescriptionDetailPage'
 
 import AdminLayout      from './features/admin-dashboard/layouts/AdminLayout'
+import AdminDashboardHome from './features/admin-dashboard/pages/DashboardHome'
+import UsersPage from './features/admin-dashboard/pages/UsersPage'
+import AdminProfilePage from './features/admin-dashboard/pages/ProfilePage'
+import AiFeaturesPage from './features/admin-dashboard/pages/AiFeaturesPage'
+import AiQueryPage      from './features/admin-dashboard/pages/AiQueryPage'
+
+
+
 import OwnerLayout      from './features/owner-dashboard/layouts/OwnerLayout'
 
 import { Toaster } from 'react-hot-toast'
@@ -64,7 +72,7 @@ export default function App() {
               </PrivateRoute>
             }
           >
-            <Route index                element={<DashboardHome />} />
+            <Route index                element={<PatientDashboardHome />} />
             <Route path="appointments"  element={<AppointmentList />} />
             <Route path="appointments/book"  element={<BookAppointmentPage />} />
             <Route path="prescriptions" element={<PrescriptionsPage />} />
@@ -108,7 +116,14 @@ export default function App() {
                 <AdminLayout />
               </PrivateRoute>
             }
-          />
+            >
+            <Route index element={<AdminDashboardHome />} />
+            <Route path="users" element={<UsersPage />} />
+            <Route path="profile" element={<AdminProfilePage />} />
+            <Route path="ai" element={<AiFeaturesPage />} />
+            <Route path="ai" element={<AiQueryPage />} />
+          </Route>  
+          
 
           {/* protected: owner */}
           <Route
