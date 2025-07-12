@@ -32,10 +32,10 @@ export default function UsersPage() {
           <tbody>
             {users.map(u => (
               <tr key={u.id} className='border-t hover:bg-gray-50'>
-                <td className='px-4 py-2'>{u.name}</td>
+                <td className='px-4 py-2'>{u.firstName} {u.lastName}</td>
                 <td className='px-4 py-2'>{u.email}</td>
                 <td className='px-4 py-2'>{u.role}</td>
-                <td className='px-4 py-2'>{u.status}</td>
+                <td className='px-4 py-2'>{u.accountStatus}</td>
               </tr>
             ))}
           </tbody>

@@ -31,7 +31,7 @@ import AdminDashboardHome from './features/admin-dashboard/pages/DashboardHome'
 import UsersPage from './features/admin-dashboard/pages/UsersPage'
 import AdminProfilePage from './features/admin-dashboard/pages/ProfilePage'
 import AiFeaturesPage from './features/admin-dashboard/pages/AiFeaturesPage'
-import AiQueryPage      from './features/admin-dashboard/pages/AiQueryPage'
+import AiQueryPage from './features/admin-dashboard/pages/AiQueryPage'
 
 
 
@@ -121,8 +121,8 @@ export default function App() {
             <Route path="users" element={<UsersPage />} />
             <Route path="profile" element={<AdminProfilePage />} />
             <Route path="ai" element={<AiFeaturesPage />} />
-            <Route path="ai" element={<AiQueryPage />} />
-          </Route>  
+            <Route path="ai/query" element={<AiQueryPage />} />
+          </Route>
           
 
           {/* protected: owner */}

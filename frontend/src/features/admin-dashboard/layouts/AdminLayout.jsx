@@ -12,7 +12,13 @@ export default function AdminLayout() {
     { name: 'Dashboard', path: '/admin', icon: HomeIcon },
     { name: 'Users', path: '/admin/users', icon: UsersIcon },
     { name: 'Profile', path: '/admin/profile', icon: UserCircleIcon },
-    { name: 'AI Features', path: '/admin/ai', icon: SparklesIcon },
+    {
+      name: 'AI Features',
+      path: '/admin/ai',
+      icon: SparklesIcon,
+      end: true,
+    },
+    { name: 'AI Query', path: '/admin/ai/query', icon: SparklesIcon },
   ];
 
   return (
@@ -22,10 +28,11 @@ export default function AdminLayout() {
           <h2 className="text-xl font-semibold text-blue-800 dark:text-blue-200">Admin Portal</h2>
         </div>
         <nav className="p-4 space-y-2">
-          {navItems.map(({ name, path, icon: Icon }) => (
+           {navItems.map(({ name, path, icon: Icon, end }) => (
             <NavLink
               key={path}
               to={path}
+              {...(end ? { end: true } : {})}
               className={({ isActive }) =>
                 `flex items-center p-3 rounded-lg transition-colors ${
                   isActive
