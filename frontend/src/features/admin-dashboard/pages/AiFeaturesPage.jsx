@@ -4,14 +4,20 @@ import axios from 'axios';
 export default function AiFeaturesPage() {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
+  const [patientId, setPatientId] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/ai/query/admin', { query });
+      const { data } = await axios.post('/api/ai/query/admin', {
+        query,
+        patient_id: patientId,
+      });
+      
       setResponse(data);
+
     } catch (err) {
       console.error('AI request failed', err);
       setResponse('Error processing query');
@@ -24,6 +30,13 @@ export default function AiFeaturesPage() {
     <div className="p-4 space-y-4">
       <h1 className="text-2xl font-bold">AI Features</h1>
       <form onSubmit={handleSubmit} className="space-y-2">
+        <input
+          type="number"
+          placeholder="Patient ID"
+          value={patientId}
+          onChange={(e) => setPatientId(e.target.value)}
+          className="w-full border rounded p-2"
+        />
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
