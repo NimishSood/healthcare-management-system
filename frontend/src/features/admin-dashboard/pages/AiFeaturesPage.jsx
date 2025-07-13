@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getPatients } from '../../../services/adminService';
 
 export default function AiFeaturesPage() {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
   const [patientId, setPatientId] = useState('');
+  const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getPatients()
+      .then(setPatients)
+      .catch(() => {});
+  }, []);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,13 +40,18 @@ export default function AiFeaturesPage() {
     <div className="p-4 space-y-4">
       <h1 className="text-2xl font-bold">AI Features</h1>
       <form onSubmit={handleSubmit} className="space-y-2">
-        <input
-          type="number"
-          placeholder="Patient ID"
+        <select
+          className="w-full border rounded p-2"
           value={patientId}
           onChange={(e) => setPatientId(e.target.value)}
-          className="w-full border rounded p-2"
-        />
+        >
+          <option value="">— Select Patient —</option>
+          {patients.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.firstName} {p.lastName}
+            </option>
+          ))}
+        </select>
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
