@@ -4,6 +4,7 @@ package com.example.healthcare.service;
 
 
 import com.example.healthcare.entity.*;
+import com.example.healthcare.dto.Appointments.AppointmentDto;
 import java.util.List;
 
 public interface AdminService {
@@ -13,7 +14,7 @@ public interface AdminService {
     void removePatient(User admin, Long patientId);
     List<Doctor> getAllDoctors(User admin);
     List<Patient> getAllPatients(User admin);
-    List<Appointment> getAllAppointments(User admin);
+    List<AppointmentDto> getAllAppointments(User admin);
     void reactivateDoctor(User admin, Long doctorId);
     void updateAdminProfile(Long adminId, Admin updatedAdmin);
     void softDeleteDoctor(Admin admin, Long doctorId);

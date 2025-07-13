@@ -2,16 +2,17 @@ package com.example.healthcare.service;
 
 import com.example.healthcare.entity.*;
 
-import java.util.List;
-import com.example.healthcare.entity.*;
+
+import com.example.healthcare.dto.Appointments.AppointmentDto;
+import com.example.healthcare.dto.Appointments.AppointmentMapper;
 import com.example.healthcare.exception.AdminNotFoundException;
 import com.example.healthcare.exception.UnauthorizedAccessException;
 import com.example.healthcare.repository.*;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -97,9 +98,11 @@ public class AdminServiceImpl implements AdminService
         return patientRepository.findAllByIsDeletedFalse();
     }
 
-    public List<Appointment> getAllAppointments(User admin) {
+    public List<AppointmentDto> getAllAppointments(User admin) {
         verifyActiveAdmin(admin);
-        return appointmentRepository.findAll();
+        return appointmentRepository.findAll().stream()
+                .map(AppointmentMapper::toDto)
+                .toList();
     }
 
     @Transactional

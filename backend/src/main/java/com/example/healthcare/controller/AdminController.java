@@ -4,6 +4,7 @@ import com.example.healthcare.dto.Profiles.AdminProfileDto;
 import com.example.healthcare.dto.Profiles.ProfileMapper;
 import com.example.healthcare.entity.*;
 import com.example.healthcare.security.SecurityUtils;
+import com.example.healthcare.dto.Appointments.AppointmentDto;
 import com.example.healthcare.service.AdminService;
 import com.example.healthcare.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
@@ -84,7 +85,7 @@ public class AdminController {
 
     // ✅ Admin can view all Appointments
     @GetMapping("/view-appointments")
-    public List<Appointment> viewAppointments() {
+    public List<AppointmentDto> viewAppointments() {
         Admin admin = securityUtils.getAuthenticatedAdmin();
         return adminService.getAllAppointments(admin);
     }

@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 import java.time.LocalDateTime;
@@ -41,6 +42,7 @@ public class User implements UserDetails {
 
     @NotBlank
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @NotBlank

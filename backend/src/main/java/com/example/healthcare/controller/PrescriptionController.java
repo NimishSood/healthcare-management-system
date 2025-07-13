@@ -17,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import com.example.healthcare.dto.Prescription.PrescriptionDto;
+import com.example.healthcare.dto.Prescription.PrescriptionMapper;
 
 import java.util.List;
 
@@ -52,19 +54,22 @@ public class PrescriptionController {
     /** GET /prescriptions/{id} - Get a prescription by its ID (Doctor, Patient, Admin/Owner) */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','ADMIN','OWNER')")
-    public ResponseEntity<Prescription> getPrescriptionById(@PathVariable Long id) {
-        User currentUser = securityUtils.getAuthenticatedUser(); // gets current User (could be Doctor, Patient, etc.)
+    public ResponseEntity<PrescriptionDto> getPrescriptionById(@PathVariable Long id) {
+        User currentUser = securityUtils.getAuthenticatedUser();
         Prescription prescription = prescriptionService.getPrescriptionById(id, currentUser);
-        return ResponseEntity.ok(prescription);
+        return ResponseEntity.ok(PrescriptionMapper.toDto(prescription));
     }
 
     /** GET /prescriptions/patient/{patientId} - List prescriptions for a patient (Doctor or Admin/Owner, or patient themselves) */
     @GetMapping("/patient/{patientId}")
     @PreAuthorize("hasAnyRole('DOCTOR','ADMIN','OWNER','PATIENT')")
-    public ResponseEntity<List<Prescription>> getPrescriptionsForPatient(@PathVariable Long patientId) {
+    public ResponseEntity<List<PrescriptionDto>> getPrescriptionsForPatient(@PathVariable Long patientId) {
         User currentUser = securityUtils.getAuthenticatedUser();
         List<Prescription> prescriptions = prescriptionService.getPrescriptionsByPatient(patientId, currentUser);
-        return ResponseEntity.ok(prescriptions);
+        List<PrescriptionDto> dtos = prescriptions.stream()
+                .map(PrescriptionMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     /** DELETE /prescriptions/{id} - Cancel (soft-delete) a prescription (Doctor or Admin/Owner) */
@@ -122,8 +127,13 @@ public class PrescriptionController {
         List<Prescription> prescriptions =
                 prescriptionService.getPrescriptionsByPatient(effectiveId, effectiveUser);
 
+        List<PrescriptionDto> dtos = prescriptions.stream()
+                .map(PrescriptionMapper::toDto)
+                .toList();
+
+
         // 4) Return the list
-        return ResponseEntity.ok(prescriptions);
+        return ResponseEntity.ok(dtos);
     }
 
 
