@@ -26,9 +26,11 @@ public class Document {
     @Column(nullable = false)
     private String contentType;
 
-    @Lob
-    @Column(nullable = false)
-    private byte[] data;
+    @Column(name = "storage_key", nullable = false)
+    private String storageKey;
+
+    @Column(name = "file_size", nullable = false)
+    private long fileSize;
 
     @Column(nullable = false)
     private LocalDateTime uploadedAt;

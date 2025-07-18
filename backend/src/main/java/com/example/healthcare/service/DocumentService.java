@@ -4,9 +4,11 @@ import com.example.healthcare.entity.Document;
 import com.example.healthcare.entity.Patient;
 import com.example.healthcare.repository.DocumentRepository;
 import com.example.healthcare.repository.PatientRepository;
+import com.example.healthcare.storage.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,16 +18,19 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
     private final PatientRepository patientRepository;
+    private final StorageService storageService;
 
     @Transactional
-    public Document saveDocument(Long patientId, String fileName, String contentType, byte[] data) {
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found"));
+    public Document saveDocument(Long patientId, MultipartFile file) throws Exception {
+        Patient patient = patientRepository.getReferenceById(patientId);
+
+        String key = storageService.store(file);
         Document document = new Document();
         document.setPatient(patient);
-        document.setFileName(fileName);
-        document.setContentType(contentType);
-        document.setData(data);
+        document.setFileName(file.getOriginalFilename());
+        document.setContentType(file.getContentType());
+        document.setStorageKey(key);
+        document.setFileSize(file.getSize());
         return documentRepository.save(document);
     }
 

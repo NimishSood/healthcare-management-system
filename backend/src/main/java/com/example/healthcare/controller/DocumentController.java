@@ -4,8 +4,9 @@ import com.example.healthcare.entity.Document;
 import com.example.healthcare.entity.Patient;
 import com.example.healthcare.security.SecurityUtils;
 import com.example.healthcare.service.DocumentService;
+import com.example.healthcare.storage.StorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,16 +22,12 @@ public class DocumentController {
 
     private final DocumentService documentService;
     private final SecurityUtils securityUtils;
+    private final StorageService storageService;
 
     @PostMapping("/upload")
     public Document upload(@RequestParam("file") MultipartFile file) throws Exception {
         Patient patient = securityUtils.getAuthenticatedPatient();
-        return documentService.saveDocument(
-                patient.getId(),
-                file.getOriginalFilename(),
-                file.getContentType(),
-                file.getBytes()
-        );
+        return documentService.saveDocument(patient.getId(), file);
     }
 
     @GetMapping("/mine")
@@ -40,11 +37,12 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ByteArrayResource> download(@PathVariable Long id) {
+    public ResponseEntity<Resource> download(@PathVariable Long id) throws Exception {
         Document doc = documentService.getDocument(id);
+        Resource resource = storageService.loadAsResource(doc.getStorageKey());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(doc.getContentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + doc.getFileName() + "\"")
-                .body(new ByteArrayResource(doc.getData()));
+                .body(resource);
     }
 }
