@@ -74,6 +74,7 @@ public class SecurityConfig {
 
                                 .requestMatchers("/patient/profile/change-password").hasRole("PATIENT")
                                 .requestMatchers("/patient/**").hasAnyRole("PATIENT", "ADMIN")
+                                .requestMatchers("/documents/**").hasRole("PATIENT")
 
 
 

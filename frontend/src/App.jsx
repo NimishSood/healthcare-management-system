@@ -43,6 +43,7 @@ import TestPasswordPage from './features/patient-dashboard/pages/TestPasswordPag
 import { ThemeProvider } from './context/ThemeContext'
 import PrescriptionDetailPage from './features/patient-dashboard/pages/PrescriptionDetailPage'
 import AppHeader from './components/AppHeader'
+import DocumentsPage from './features/patient-dashboard/pages/DocumentsPage'
 
 
 
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="appointments"  element={<AppointmentList />} />
             <Route path="appointments/book"  element={<BookAppointmentPage />} />
             <Route path="prescriptions" element={<PrescriptionsPage />} />
+            <Route path="documents" element={<DocumentsPage />} />
             <Route path="profile"       element={<PatientProfilePage />} />
             <Route path="messages" element={<MessagePage role="patient" />} />
             

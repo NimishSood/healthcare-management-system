@@ -60,3 +60,35 @@ export async function requestRefill(prescriptionId) {
   return data;
 }
 
+/**
+ * Upload a document for the authenticated patient.
+ * @param {File} file - file to upload
+ * @returns {Promise<Object>} saved document metadata
+ */
+export async function uploadDocument(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const { data } = await axios.post('/documents/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
+/**
+ * Retrieve all documents uploaded by the authenticated patient.
+ * @returns {Promise<Array>} list of document objects
+ */
+export async function getDocuments() {
+  const { data } = await axios.get('/documents/mine');
+  return data;
+}
+
+/**
+ * Download a specific document.
+ * @param {number} id - document id
+ * @returns {Promise<Blob>} file contents as blob
+ */
+export async function downloadDocument(id) {
+  const { data } = await axios.get(`/documents/${id}`, { responseType: 'blob' });
+  return data;
+}
