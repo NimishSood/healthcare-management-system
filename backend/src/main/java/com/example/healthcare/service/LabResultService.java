@@ -2,13 +2,13 @@ package com.example.healthcare.service;
 
 import com.example.healthcare.entity.*;
 import com.example.healthcare.repository.*;
-import com.example.healthcare.repository.LabResultAttachmentRepository;
-import com.example.healthcare.entity.LabResultAttachment;
-import com.example.healthcare.storage.StorageService;
-import org.springframework.web.multipart.MultipartFile;
+import com.example.healthcare.entity.Attachment;
+import com.example.healthcare.entity.enums.AttachmentParentType;
+import com.example.healthcare.service.AttachmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,8 +20,7 @@ public class LabResultService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
-    private final LabResultAttachmentRepository labResultAttachmentRepository;
-    private final StorageService storageService;
+    private final AttachmentService attachmentService;
 
     @Transactional
     public LabResult createLabResult(Long patientId, Long doctorId, Long appointmentId,
@@ -70,30 +69,27 @@ public class LabResultService {
 
     public void deleteLabResult(Long id) {
         labResultRepository.deleteById(id);
+        try {
+            attachmentService.deleteAllForParent(AttachmentParentType.LAB_RESULT, id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     @Transactional
-    public LabResultAttachment addAttachment(Long labResultId, MultipartFile file) throws Exception {
-        LabResult lr = getLabResult(labResultId);
-        String key = storageService.store(file);
-        LabResultAttachment att = new LabResultAttachment();
-        att.setLabResult(lr);
-        att.setFileName(file.getOriginalFilename());
-        att.setContentType(file.getContentType());
-        att.setStorageKey(key);
-        att.setFileSize(file.getSize());
-        return labResultAttachmentRepository.save(att);
+    public Attachment addAttachment(Long labResultId, MultipartFile file) throws Exception {
+        getLabResult(labResultId); // ensure exists and authorized
+        return attachmentService.addAttachment(AttachmentParentType.LAB_RESULT, labResultId, file);
     }
 
-    public List<LabResultAttachment> getAttachments(Long labResultId) {
-        return labResultAttachmentRepository.findByLabResultId(labResultId);
+    public List<Attachment> getAttachments(Long labResultId) {
+        return attachmentService.listAttachments(AttachmentParentType.LAB_RESULT, labResultId);
     }
 
-    public LabResultAttachment getAttachment(Long attachmentId) {
-        return labResultAttachmentRepository.findById(attachmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
+    public Attachment getAttachment(Long attachmentId) {
+        return attachmentService.getAttachment(attachmentId);
     }
 
-    public void deleteAttachment(Long attachmentId) {
-        labResultAttachmentRepository.deleteById(attachmentId);
+    public void deleteAttachment(Long attachmentId) throws Exception {
+        attachmentService.deleteAttachment(attachmentId);
     }
 }

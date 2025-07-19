@@ -8,4 +8,5 @@ import java.io.IOException;
 public interface StorageService {
     String store(MultipartFile file) throws IOException;
     Resource loadAsResource(String storageKey) throws IOException;
+    void delete(String storageKey) throws IOException;
 }

@@ -1,6 +1,7 @@
 package com.example.healthcare.controller;
 
 import com.example.healthcare.entity.*;
+import com.example.healthcare.entity.Attachment;
 import com.example.healthcare.entity.Patient;
 import com.example.healthcare.entity.Doctor;
 import com.example.healthcare.entity.User;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -103,29 +105,36 @@ public class LabResultController {
         verifyModifyAccess(lr);
         labResultService.deleteLabResult(id);
     }
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @PostMapping("/{id}/attachments")
-    public List<LabResultAttachment> upload(@PathVariable Long id,
-                                            @RequestParam("files") MultipartFile[] files) throws Exception {
+    public List<Attachment> upload(@PathVariable Long id,
+                                   @RequestParam("files") MultipartFile[] files) throws Exception {
         LabResult lr = labResultService.getLabResult(id);
         verifyModifyAccess(lr);
-        List<LabResultAttachment> list = new java.util.ArrayList<>();
+        List<Attachment> list = new java.util.ArrayList<>();
         for (MultipartFile f : files) {
             list.add(labResultService.addAttachment(id, f));
         }
         return list;
     }
 
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN','PATIENT')")
     @GetMapping("/{id}/attachments")
-    public List<LabResultAttachment> listAttachments(@PathVariable Long id) {
+    public List<Attachment> listAttachments(@PathVariable Long id) {
         LabResult lr = labResultService.getLabResult(id);
         verifyAccess(lr);
         return labResultService.getAttachments(id);
     }
 
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN','PATIENT')")
     @GetMapping("/attachments/{attId}")
     public ResponseEntity<Resource> downloadAttachment(@PathVariable Long attId) throws Exception {
-        LabResultAttachment att = labResultService.getAttachment(attId);
-        verifyAccess(att.getLabResult());
+        Attachment att = labResultService.getAttachment(attId);
+        if (att.getParentType() != com.example.healthcare.entity.enums.AttachmentParentType.LAB_RESULT) {
+            throw new UnauthorizedAccessException("Invalid attachment");
+        }
+        LabResult lr = labResultService.getLabResult(att.getParentId());
+        verifyAccess(lr);
         Resource res = storageService.loadAsResource(att.getStorageKey());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(att.getContentType()))
@@ -133,10 +142,15 @@ public class LabResultController {
                 .body(res);
     }
 
+    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
     @DeleteMapping("/attachments/{attId}")
-    public void deleteAttachment(@PathVariable Long attId) {
-        LabResultAttachment att = labResultService.getAttachment(attId);
-        verifyModifyAccess(att.getLabResult());
+    public void deleteAttachment(@PathVariable Long attId) throws Exception {
+        Attachment att = labResultService.getAttachment(attId);
+        if (att.getParentType() != com.example.healthcare.entity.enums.AttachmentParentType.LAB_RESULT) {
+            throw new UnauthorizedAccessException("Invalid attachment");
+        }
+        LabResult lr = labResultService.getLabResult(att.getParentId());
+        verifyModifyAccess(lr);
         labResultService.deleteAttachment(attId);
     }
 }

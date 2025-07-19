@@ -48,4 +48,9 @@ public class FilesystemStorageService implements StorageService {
         }
         return resource;
     }
+    @Override
+    public void delete(String storageKey) throws IOException {
+        Path filePath = basePath.resolve(storageKey);
+        Files.deleteIfExists(filePath);
+    }
 }
