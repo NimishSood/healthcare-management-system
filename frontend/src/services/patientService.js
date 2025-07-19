@@ -92,3 +92,14 @@ export async function downloadDocument(id) {
   const { data } = await axios.get(`/documents/${id}`, { responseType: 'blob' });
   return data;
 }
+
+
+/**
+ * Delete a document by ID.
+ * @param {number} id - document id
+ * @returns {Promise<void>} confirmation from backend
+ */
+export async function deleteDocument(id) {
+  const { data } = await axios.delete(`/documents/${id}`);
+  return data;
+}
