@@ -1,5 +1,7 @@
 package com.example.healthcare.controller;
 
+
+import com.example.healthcare.entity.Admin;
 import com.example.healthcare.security.SecurityUtils;
 import com.example.healthcare.service.AiService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +22,16 @@ public class AiController {
     @PostMapping("/query/admin")
     public ResponseEntity<String> adminQuery(@RequestBody Map<String, Object> body,
                                              HttpServletRequest request) {
-        securityUtils.getAuthenticatedAdmin();
+        Admin admin = securityUtils.getAuthenticatedAdmin();
         String token = request.getHeader("Authorization");
         String resp = aiService.forwardAdminQuery(body, token);
+        Object pidObj = body.get("patient_id");
+        Long patientId = pidObj instanceof Number ? ((Number) pidObj).longValue() : null;
+        String query = (String) body.getOrDefault("query", "");
+
+        AiService.ParsedAiResponse parsed = aiService.parseResponse(resp);
+        String status = parsed.error() ? "ERROR" : (parsed.hasData() ? "FOUND" : "NOT_FOUND");
+        aiService.logAdminQuery(admin.getEmail(), patientId, query, parsed.intent(), status);
         return ResponseEntity.ok(resp);
     }
 
