@@ -2,6 +2,7 @@ package com.example.healthcare.entity;
 
 import com.example.healthcare.entity.enums.AccountStatus;
 import com.example.healthcare.entity.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -42,7 +43,7 @@ public class User implements UserDetails {
 
     @NotBlank
     @Column(nullable = false)
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotBlank

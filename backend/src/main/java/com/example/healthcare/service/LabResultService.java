@@ -2,6 +2,10 @@ package com.example.healthcare.service;
 
 import com.example.healthcare.entity.*;
 import com.example.healthcare.repository.*;
+import com.example.healthcare.repository.LabResultAttachmentRepository;
+import com.example.healthcare.entity.LabResultAttachment;
+import com.example.healthcare.storage.StorageService;
+import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +20,8 @@ public class LabResultService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
+    private final LabResultAttachmentRepository labResultAttachmentRepository;
+    private final StorageService storageService;
 
     @Transactional
     public LabResult createLabResult(Long patientId, Long doctorId, Long appointmentId,
@@ -64,5 +70,30 @@ public class LabResultService {
 
     public void deleteLabResult(Long id) {
         labResultRepository.deleteById(id);
+    }
+    @Transactional
+    public LabResultAttachment addAttachment(Long labResultId, MultipartFile file) throws Exception {
+        LabResult lr = getLabResult(labResultId);
+        String key = storageService.store(file);
+        LabResultAttachment att = new LabResultAttachment();
+        att.setLabResult(lr);
+        att.setFileName(file.getOriginalFilename());
+        att.setContentType(file.getContentType());
+        att.setStorageKey(key);
+        att.setFileSize(file.getSize());
+        return labResultAttachmentRepository.save(att);
+    }
+
+    public List<LabResultAttachment> getAttachments(Long labResultId) {
+        return labResultAttachmentRepository.findByLabResultId(labResultId);
+    }
+
+    public LabResultAttachment getAttachment(Long attachmentId) {
+        return labResultAttachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
+    }
+
+    public void deleteAttachment(Long attachmentId) {
+        labResultAttachmentRepository.deleteById(attachmentId);
     }
 }
