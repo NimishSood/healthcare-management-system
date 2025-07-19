@@ -42,4 +42,7 @@ public class DocumentService {
     public List<Document> getDocumentsForPatient(Long patientId) {
         return documentRepository.findByPatientId(patientId);
     }
+    public void deleteDocument(Long id) {
+        documentRepository.deleteById(id);
+    }
 }

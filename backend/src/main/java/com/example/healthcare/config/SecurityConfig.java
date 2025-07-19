@@ -76,6 +76,16 @@ public class SecurityConfig {
                                 .requestMatchers("/patient/**").hasAnyRole("PATIENT", "ADMIN")
                                 .requestMatchers("/documents/**").hasRole("PATIENT")
 
+                                .requestMatchers(HttpMethod.GET, "/lab-results/**").hasAnyRole("PATIENT","DOCTOR","ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/lab-results/**").hasAnyRole("DOCTOR","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/lab-results/**").hasAnyRole("DOCTOR","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/lab-results/**").hasAnyRole("DOCTOR","ADMIN")
+
+                                .requestMatchers(HttpMethod.GET, "/medical-records/**").hasAnyRole("PATIENT","DOCTOR","ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/medical-records/**").hasAnyRole("DOCTOR","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/medical-records/**").hasAnyRole("DOCTOR","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/medical-records/**").hasAnyRole("DOCTOR","ADMIN")
+
 
 
 

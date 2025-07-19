@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.healthcare.exception.UnauthorizedAccessException;
 
 import java.util.List;
 
@@ -39,10 +40,23 @@ public class DocumentController {
     @GetMapping("/{id}")
     public ResponseEntity<Resource> download(@PathVariable Long id) throws Exception {
         Document doc = documentService.getDocument(id);
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        if (!doc.getPatient().getId().equals(patient.getId())) {
+            throw new UnauthorizedAccessException("Access denied");
+        }
         Resource resource = storageService.loadAsResource(doc.getStorageKey());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(doc.getContentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + doc.getFileName() + "\"")
                 .body(resource);
+    }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        Document doc = documentService.getDocument(id);
+        Patient patient = securityUtils.getAuthenticatedPatient();
+        if (!doc.getPatient().getId().equals(patient.getId())) {
+            throw new UnauthorizedAccessException("Access denied");
+        }
+        documentService.deleteDocument(id);
     }
 }

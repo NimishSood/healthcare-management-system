@@ -36,13 +36,36 @@ public class MedicalRecordController {
             if (record.getDoctor() == null || !record.getDoctor().getId().equals(d.getId())) {
                 throw new UnauthorizedAccessException("Access denied");
             }
+        } else if (user instanceof Admin) {
+            // admins allowed
         } else {
             throw new UnauthorizedAccessException("Access denied");
         }
     }
+    private void verifyModifyAccess(MedicalRecord record) {
+        User user = securityUtils.getAuthenticatedUser();
+        if (user instanceof Doctor d) {
+            if (record.getDoctor() == null || !record.getDoctor().getId().equals(d.getId())) {
+                throw new UnauthorizedAccessException("Access denied");
+            }
+        } else if (!(user instanceof Admin)) {
+            throw new UnauthorizedAccessException("Access denied");
+        }
+    }
+
 
     @PostMapping
     public MedicalRecord create(@RequestBody MedicalRecord request) {
+        // only doctors or admins can create
+        User user = securityUtils.getAuthenticatedUser();
+        if (user instanceof Doctor d) {
+            if (request.getDoctor() != null && !request.getDoctor().getId().equals(d.getId())) {
+                throw new UnauthorizedAccessException("Access denied");
+            }
+        } else if (!(user instanceof Admin)) {
+            throw new UnauthorizedAccessException("Access denied");
+        }
+
         return medicalRecordService.createMedicalRecord(
                 request.getPatient().getId(),
                 request.getDoctor() != null ? request.getDoctor().getId() : null,
@@ -65,18 +88,22 @@ public class MedicalRecordController {
 
     @PutMapping("/{id}")
     public MedicalRecord update(@PathVariable Long id, @RequestBody MedicalRecord request) {
+        MedicalRecord record = medicalRecordService.getMedicalRecord(id);
+        verifyModifyAccess(record);
         return medicalRecordService.updateMedicalRecord(id, request.getDescription());
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
+        MedicalRecord record = medicalRecordService.getMedicalRecord(id);
+        verifyModifyAccess(record);
         medicalRecordService.deleteMedicalRecord(id);
     }
     @PostMapping("/{id}/attachments")
     public List<MedicalRecordAttachment> upload(@PathVariable Long id,
                                                 @RequestParam("files") MultipartFile[] files) throws Exception {
         MedicalRecord record = medicalRecordService.getMedicalRecord(id);
-        verifyAccess(record);
+        verifyModifyAccess(record);
         List<MedicalRecordAttachment> list = new java.util.ArrayList<>();
         for (MultipartFile f : files) {
             list.add(medicalRecordService.addAttachment(id, f));
@@ -105,7 +132,7 @@ public class MedicalRecordController {
     @DeleteMapping("/attachments/{attId}")
     public void deleteAttachment(@PathVariable Long attId) {
         MedicalRecordAttachment att = medicalRecordService.getAttachment(attId);
-        verifyAccess(att.getMedicalRecord());
+        verifyModifyAccess(att.getMedicalRecord());
         medicalRecordService.deleteAttachment(attId);
     }
 }

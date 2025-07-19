@@ -37,13 +37,35 @@ public class LabResultController {
             if (!lr.getDoctor().getId().equals(d.getId())) {
                 throw new UnauthorizedAccessException("Access denied");
             }
+        } else if (user instanceof Admin) {
+            // admins always allowed
+
         } else {
+            throw new UnauthorizedAccessException("Access denied");
+        }
+    }
+    private void verifyModifyAccess(LabResult lr) {
+        User user = securityUtils.getAuthenticatedUser();
+        if (user instanceof Doctor d) {
+            if (!lr.getDoctor().getId().equals(d.getId())) {
+                throw new UnauthorizedAccessException("Access denied");
+            }
+        } else if (!(user instanceof Admin)) {
             throw new UnauthorizedAccessException("Access denied");
         }
     }
 
     @PostMapping
     public LabResult create(@RequestBody LabResult request) {
+        // only doctors or admins can create
+        User user = securityUtils.getAuthenticatedUser();
+        if (user instanceof Doctor d) {
+            if (!request.getDoctor().getId().equals(d.getId())) {
+                throw new UnauthorizedAccessException("Access denied");
+            }
+        } else if (!(user instanceof Admin)) {
+            throw new UnauthorizedAccessException("Access denied");
+        }
         return labResultService.createLabResult(
                 request.getPatient().getId(),
                 request.getDoctor().getId(),
@@ -70,18 +92,22 @@ public class LabResultController {
 
     @PutMapping("/{id}")
     public LabResult update(@PathVariable Long id, @RequestBody LabResult request) {
+        LabResult lr = labResultService.getLabResult(id);
+        verifyModifyAccess(lr);
         return labResultService.updateLabResult(id, request);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
+        LabResult lr = labResultService.getLabResult(id);
+        verifyModifyAccess(lr);
         labResultService.deleteLabResult(id);
     }
     @PostMapping("/{id}/attachments")
     public List<LabResultAttachment> upload(@PathVariable Long id,
                                             @RequestParam("files") MultipartFile[] files) throws Exception {
         LabResult lr = labResultService.getLabResult(id);
-        verifyAccess(lr);
+        verifyModifyAccess(lr);
         List<LabResultAttachment> list = new java.util.ArrayList<>();
         for (MultipartFile f : files) {
             list.add(labResultService.addAttachment(id, f));
@@ -110,7 +136,7 @@ public class LabResultController {
     @DeleteMapping("/attachments/{attId}")
     public void deleteAttachment(@PathVariable Long attId) {
         LabResultAttachment att = labResultService.getAttachment(attId);
-        verifyAccess(att.getLabResult());
+        verifyModifyAccess(att.getLabResult());
         labResultService.deleteAttachment(attId);
     }
 }
